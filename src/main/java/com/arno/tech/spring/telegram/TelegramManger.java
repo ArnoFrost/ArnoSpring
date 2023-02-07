@@ -37,11 +37,17 @@ public class TelegramManger {
         logUtils = new LogUtils();
     }
 
+    /**
+     * 初始化配置
+     */
     public void init() {
-        bot = new TelegramBot(config.getToken());
-        //调试用
-//        bot = new TelegramBot.Builder(config.getToken()).debug().build();
-        logUtils.log(LogUtils.LogLevel.INFO, config, "TelegramManger", null, "Telegram bot init name = " + config.getName() + ", token = " + config.getToken(), null);
+        if (config.isDebug()) {
+            bot = new TelegramBot.Builder(config.getToken()).debug().build();
+            //调试用
+            logUtils.log(LogUtils.LogLevel.DEBUG, config, "TelegramManger", null, "Telegram bot init name = " + config.getName() + ", token = " + config.getToken(), null);
+        } else {
+            bot = new TelegramBot(config.getToken());
+        }
 
         //注册消息监听
         bot.setUpdatesListener(updates -> {
@@ -54,7 +60,7 @@ public class TelegramManger {
     /**
      * 分发消息
      *
-     * @param update
+     * @param update {@link Update}
      */
     private void dispatchUpdate(Update update) {
         if (update == null) {
@@ -94,9 +100,9 @@ public class TelegramManger {
     /**
      * 显示帮助信息
      *
-     * @param bot
-     * @param helpType
-     * @param chatId
+     * @param bot      botApi
+     * @param helpType 帮助类型
+     * @param chatId   对话Id
      */
     private void answerHelp(TelegramBot bot, String helpType, Long chatId) {
         logUtils.log(LogUtils.LogLevel.INFO, config, "answerHelp", chatId, "helpType = " + helpType, null);
@@ -133,6 +139,13 @@ public class TelegramManger {
         logUtils.log(LogUtils.LogLevel.INFO, config, "answerHelp", chatId, "answerHelp is send ok = " + ok, null);
     }
 
+    /**
+     * 异步chatgpt聊天
+     *
+     * @param bot      botApi
+     * @param question 问题
+     * @param chatId   对话Id
+     */
     private void answerByChatGptAsync(TelegramBot bot, String question, Long chatId) {
         logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "question = " + question, null);
         sendState(chatId, ChatAction.typing);
@@ -165,8 +178,8 @@ public class TelegramManger {
     /**
      * 状态更新
      *
-     * @param chatId
-     * @param chatAction
+     * @param chatId     对话Id
+     * @param chatAction 状态
      */
     private void sendState(Long chatId, ChatAction chatAction) {
         SendChatAction sendChatAction = new SendChatAction(chatId, chatAction);

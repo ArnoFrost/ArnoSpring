@@ -1,6 +1,7 @@
 package com.arno.tech.spring.telegram;
 
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,11 @@ import java.util.Map;
 @Component
 @ConfigurationProperties(prefix = "telegram.bot")
 public class TgConfig {
+
+    /**
+     * 调试模式
+     */
+    private boolean debug;
 
     /**
      * bot token
@@ -43,7 +49,7 @@ public class TgConfig {
      * @param chatId 对话id
      * @return {@link String}
      */
-    public String getUserNameByChatId(Long chatId) {
+    public @Nullable String getUserNameByChatId(Long chatId) {
         if (chatId == null) {
             return null;
         }
