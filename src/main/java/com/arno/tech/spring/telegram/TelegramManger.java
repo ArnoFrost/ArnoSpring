@@ -128,7 +128,7 @@ public class TelegramManger {
                 break;
             case ChatBotCommand.CHAT_GPT_REGISTER:
                 logUtils.log(LogUtils.LogLevel.WARN, config, "answerHelp", chatId, "chatId = " + chatId + " 未注册", null);
-                answer = "请先注册, 向Arno 反馈本次对话信息id : " + chatId;
+                answer = "白名单机制开启,请向管理员Arno 反馈本次会话 id : \n" + chatId;
                 break;
             default:
                 answer = "未知命令";
