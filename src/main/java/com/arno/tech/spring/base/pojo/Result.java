@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 统一的结果类
  *
- * @author suanxiao5
+ * @author xuxui14
  */
 @Data
 public class Result<T> {

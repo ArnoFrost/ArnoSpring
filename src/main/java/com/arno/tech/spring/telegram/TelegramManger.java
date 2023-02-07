@@ -1,15 +1,15 @@
 package com.arno.tech.spring.telegram;
 
 import com.arno.tech.spring.chatgpt.service.ChatService;
+import com.arno.tech.spring.telegram.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -23,30 +23,29 @@ import java.io.IOException;
  * @since 2023/02/07
  */
 @Component
-@Slf4j
 public class TelegramManger {
     private final ChatService chatService;
     private final TgConfig config;
     private TelegramBot bot;
 
+    private final LogUtils logUtils;
+
     @Autowired
     public TelegramManger(ChatService chatService, TgConfig config) {
         this.chatService = chatService;
         this.config = config;
+        logUtils = new LogUtils();
     }
 
     public void init() {
         bot = new TelegramBot(config.getToken());
         //调试用
 //        bot = new TelegramBot.Builder(config.getToken()).debug().build();
-        log.info("Telegram bot init name = {}, token = {}", config.getName(), config.getToken());
+        logUtils.log(LogUtils.LogLevel.INFO, config, "TelegramManger", null, "Telegram bot init name = " + config.getName() + ", token = " + config.getToken(), null);
 
         //注册消息监听
         bot.setUpdatesListener(updates -> {
-            updates.forEach(update -> {
-                log.info("update = {}", update.message().text());
-                dispatchUpdate(update);
-            });
+            updates.forEach(this::dispatchUpdate);
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         });
 
@@ -59,20 +58,20 @@ public class TelegramManger {
      */
     private void dispatchUpdate(Update update) {
         if (update == null) {
-            log.error("update is null");
+            logUtils.log(LogUtils.LogLevel.ERROR, config, "dispatchUpdate", null, "update is null", null);
             return;
         }
         if (update.message() == null) {
-            log.error("update message is null");
+            logUtils.log(LogUtils.LogLevel.ERROR, config, "dispatchUpdate", null, "update message is null", null);
             return;
         }
         if (update.message().text() == null) {
-            log.error("update message text is null");
+            logUtils.log(LogUtils.LogLevel.ERROR, config, "dispatchUpdate", null, "update message text is null", null);
             return;
         }
         Long chatId = update.message().chat().id();
         String text = update.message().text();
-        log.info("dispatchUpdate chatId = {}, text = {}", chatId, text);
+        logUtils.log(LogUtils.LogLevel.INFO, config, "dispatchUpdate", chatId, "text = " + text, null);
         String content;
         if (text.startsWith(ChatBotCommand.START)) {
             answerHelp(bot, ChatBotCommand.START, chatId);
@@ -81,6 +80,11 @@ public class TelegramManger {
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_HELP)) {
             answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT)) {
+            //中断操作
+            if (!config.isInWhiteList(chatId)) {
+                answerHelp(bot, ChatBotCommand.CHAT_GPT_REGISTER, chatId);
+                return;
+            }
             content = text.substring(ChatBotCommand.CHAT_GPT.length());
             answerByChatGptAsync(bot, content, chatId);
         }
@@ -95,7 +99,7 @@ public class TelegramManger {
      * @param chatId
      */
     private void answerHelp(TelegramBot bot, String helpType, Long chatId) {
-        log.info("answerHelp chatId = {}, helpType = {}", chatId, helpType);
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerHelp", chatId, "helpType = " + helpType, null);
         String answer = "";
         switch (helpType) {
             case ChatBotCommand.START:
@@ -116,17 +120,21 @@ public class TelegramManger {
             case ChatBotCommand.CHAT_GPT_HELP:
                 answer = ChatBotCommand.CHAT_GPT_HELP_INFO;
                 break;
+            case ChatBotCommand.CHAT_GPT_REGISTER:
+                logUtils.log(LogUtils.LogLevel.WARN, config, "answerHelp", chatId, "chatId = " + chatId + " 未注册", null);
+                answer = "请先注册, 向Arno 反馈本次对话信息id : " + chatId;
+                break;
             default:
                 answer = "未知命令";
                 break;
         }
         SendResponse execute = bot.execute(new SendMessage(chatId, answer));
         boolean ok = execute.isOk();
-        System.out.println("answerHelp is send ok = " + ok);
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerHelp", chatId, "answerHelp is send ok = " + ok, null);
     }
 
     private void answerByChatGptAsync(TelegramBot bot, String question, Long chatId) {
-        log.info("answerByChatGptAsync chatId = {}, question = {}", chatId, question);
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "question = " + question, null);
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
             bot.execute(new SendMessage(chatId, "请输入内容"));
@@ -138,15 +146,15 @@ public class TelegramManger {
                 @Override
                 public void onResponse(SendMessage request, SendResponse response) {
                     if (response.isOk()) {
-                        log.info("answerByChatGptAsync send message ok");
+                        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "answerByChatGptAsync send message ok", null);
                     } else {
-                        log.error("answerByChatGptAsync send message error, code = {}, description = {}", response.errorCode(), response.description());
+                        logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatGptAsync", chatId, "answerByChatGptAsync send message error, code = " + response.errorCode() + ", description = " + response.description(), null);
                     }
                 }
 
                 @Override
                 public void onFailure(SendMessage request, IOException e) {
-                    log.error("answerByChatGptAsync send message error", e);
+                    logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatGptAsync", chatId, "answerByChatGptAsync send message error", e);
                 }
             });
         });
