@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="false"
+               debug="false">
+    <!-- 定义日志目录 -->
+    <property name="LOG_HOME"
+              value="logs"/>
+    <!-- 定义日志保留天数 -->
+    <property name="MAX_HISTORY"
+              value="7"/>
+    <!-- 定义日志文件总大小 -->
+    <property name="TOTAL_SIZE_CAP"
+              value="1GB"/>
+    <!-- 定义单个日志文件大小 -->
+    <property name="MAX_FILE_SIZE"
+              value="50MB"/>
+
+    <appender name="local_log"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <fileNamePattern>${LOG_HOME}/local/frontend.log.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 单个日志文件大小 -->
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <!-- 日志文件总大小 -->
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+            <!--日志文件保留天数-->
+            <MaxHistory>${MAX_HISTORY}</MaxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{RemoteIP}] [%X{HomeIP}] [%X{User-Agent}] [%thread] [%level] [%logger{50}] [%msg]%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework.web"
+            level="INFO"/>
+    <root level="INFO">
+        <appender-ref ref="local_log"/>
+    </root>
+</configuration>
