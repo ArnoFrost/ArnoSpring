@@ -14,24 +14,24 @@ public class LogUtils {
     public void log(int logLevel, TgConfig config, String tag, Long chatId, String str, Exception e) {
         if (config.isWhiteEnable()) {
             if (logLevel == LogLevel.DEBUG) {
-                log.debug("{} chatId = {}, user = {}, str = {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.debug("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
             } else if (logLevel == LogLevel.INFO) {
-                log.info("{} chatId = {}, user = {}, str = {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.info("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
             } else if (logLevel == LogLevel.WARN) {
-                log.warn("{} chatId = {}, user = {}, str = {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.warn("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
             } else if (logLevel == LogLevel.ERROR) {
-                log.error("{} chatId = {}, user = {}, str = {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.error("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
             }
-            log.info("{} chatId = {}, user = {}, str = {}", tag, chatId, config.getUserNameByChatId(chatId), str);
+            log.info("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str);
         } else {
             if (logLevel == LogLevel.DEBUG) {
-                log.debug("{} chatId = {}, str = {}", tag, chatId, str, e);
+                log.debug("{}: chatId = {}, {}", tag, chatId, str, e);
             } else if (logLevel == LogLevel.INFO) {
-                log.info("{} chatId = {}, str = {}", tag, chatId, str, e);
+                log.info("{}: chatId = {}, {}", tag, chatId, str, e);
             } else if (logLevel == LogLevel.WARN) {
-                log.warn("{} chatId = {}, str = {}", tag, chatId, str, e);
+                log.warn("{}: chatId = {}, {}", tag, chatId, str, e);
             } else if (logLevel == LogLevel.ERROR) {
-                log.error("{} chatId = {}, str = {}", tag, chatId, str, e);
+                log.error("{}: chatId = {}, {}", tag, chatId, str, e);
             }
         }
     }
