@@ -200,7 +200,7 @@ public class OkHttpUtils {
                     return null;
                 }
                 if (!response.isSuccessful()) {
-                    log.error(tag + " doPostApi response is not successful");
+                    log.error(tag + " doPostApi response is not successful response code: {}", response.code());
                     return null;
                 }
                 resp = response.body().string();
