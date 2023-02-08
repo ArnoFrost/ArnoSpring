@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * 项目启动类
  *
  * @author xuxin14
- * @date 2023/02/02
+ * @since 2023/02/02
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class ArnoSpringApplication {

@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * 初步封装采用需要实例化的方式
  *
  * @author xuxin14
- * @date 2022/12/13
+ * @since 2022/12/13
  */
 @Slf4j
 public class OkHttpUtils {

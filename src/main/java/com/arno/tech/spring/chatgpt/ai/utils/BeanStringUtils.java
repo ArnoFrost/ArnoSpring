@@ -7,7 +7,7 @@ import org.springframework.lang.Nullable;
 /**
  * Bean与String的转换工具类
  *
- * @author sunxiao5@staff.sina.com.cn
+ * @author xuxin14
  */
 public class BeanStringUtils {
     public static <T> String beanToString(T value) {
