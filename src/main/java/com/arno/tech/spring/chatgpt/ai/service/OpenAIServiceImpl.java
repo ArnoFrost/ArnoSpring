@@ -83,6 +83,10 @@ public class OpenAIServiceImpl implements IOpenAI {
 
         AIAnswer aiAnswer = okHttpUtils.doPostApi("doChatGpt", "https://api.openai.com/v1/completions", headers, params, typeReference);
         StringBuilder answers = new StringBuilder();
+        if (aiAnswer == null) {
+            consumer.accept("请求失败");
+            return;
+        }
         List<AIAnswer.Choices> choices = aiAnswer.getChoices();
         if (choices == null || choices.size() == 0) {
             consumer.accept("请求失败");
