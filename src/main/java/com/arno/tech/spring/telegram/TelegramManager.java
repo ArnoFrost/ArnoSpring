@@ -76,6 +76,7 @@ public class TelegramManager {
             return;
         }
         Long chatId = update.message().chat().id();
+        Integer messageId = update.message().messageId();
         String text = update.message().text();
         logUtils.log(LogUtils.LogLevel.INFO, config, "dispatchUpdate", chatId, "text = " + text, null);
         String content;
@@ -92,7 +93,7 @@ public class TelegramManager {
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_GPT.length());
-            answerByChatGptAsync(bot, content, chatId);
+            answerByChatGptAsync(bot, content, chatId, messageId);
         }
 
     }
@@ -146,8 +147,8 @@ public class TelegramManager {
      * @param question 问题
      * @param chatId   对话Id
      */
-    private void answerByChatGptAsync(TelegramBot bot, String question, Long chatId) {
-        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "question = " + question, null);
+    private void answerByChatGptAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
             bot.execute(new SendMessage(chatId, "请输入内容"));
@@ -155,6 +156,7 @@ public class TelegramManager {
         }
         chatService.doChat(question, answer -> {
             SendMessage sendMessage = new SendMessage(chatId, answer);
+            sendMessage.replyToMessageId(messageId);
             bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
                 @Override
                 public void onResponse(SendMessage request, SendResponse response) {
