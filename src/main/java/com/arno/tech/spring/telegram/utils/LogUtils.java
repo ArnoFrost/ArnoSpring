@@ -22,7 +22,6 @@ public class LogUtils {
             } else if (logLevel == LogLevel.ERROR) {
                 log.error("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
             }
-            log.info("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str);
         } else {
             if (logLevel == LogLevel.DEBUG) {
                 log.debug("{}: chatId = {}, {}", tag, chatId, str, e);

@@ -90,6 +90,7 @@ public class TelegramManager {
             //中断操作
             if (!config.isInWhiteList(chatId)) {
                 answerHelp(bot, ChatBotCommand.CHAT_GPT_REGISTER, chatId);
+                logUtils.log(LogUtils.LogLevel.WARN, config, "dispatchUpdate", chatId, "chatId is not in white list", null);
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_GPT.length());
@@ -151,6 +152,7 @@ public class TelegramManager {
         logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
+            logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatGptAsync", chatId, "question is null", null);
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
