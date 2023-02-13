@@ -23,7 +23,7 @@ import java.io.IOException;
  * @since 2023/02/07
  */
 @Component
-public class TelegramManger {
+public class TelegramManager {
     private final ChatService chatService;
     private final TgConfig config;
     private TelegramBot bot;
@@ -31,7 +31,7 @@ public class TelegramManger {
     private final LogUtils logUtils;
 
     @Autowired
-    public TelegramManger(ChatService chatService, TgConfig config) {
+    public TelegramManager(ChatService chatService, TgConfig config) {
         this.chatService = chatService;
         this.config = config;
         logUtils = new LogUtils();
