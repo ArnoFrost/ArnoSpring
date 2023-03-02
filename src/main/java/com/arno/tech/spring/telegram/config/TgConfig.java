@@ -1,4 +1,4 @@
-package com.arno.tech.spring.telegram;
+package com.arno.tech.spring.telegram.config;
 
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;

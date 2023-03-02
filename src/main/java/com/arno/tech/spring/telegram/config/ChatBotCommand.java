@@ -1,4 +1,4 @@
-package com.arno.tech.spring.telegram;
+package com.arno.tech.spring.telegram.config;
 
 /**
  * 聊天机器人 命令

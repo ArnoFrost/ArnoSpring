@@ -1,6 +1,6 @@
 package com.arno.tech.spring.telegram.utils;
 
-import com.arno.tech.spring.telegram.TgConfig;
+import com.arno.tech.spring.telegram.config.TgConfig;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -3,6 +3,8 @@ package com.arno.tech.spring.telegram;
 import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.arno.tech.spring.chatgpt.ai.vo.ChatVo;
 import com.arno.tech.spring.chatgpt.service.ChatService;
+import com.arno.tech.spring.telegram.config.ChatBotCommand;
+import com.arno.tech.spring.telegram.config.TgConfig;
 import com.arno.tech.spring.telegram.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
