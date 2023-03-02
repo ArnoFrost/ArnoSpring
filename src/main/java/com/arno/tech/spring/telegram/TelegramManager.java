@@ -1,5 +1,6 @@
 package com.arno.tech.spring.telegram;
 
+import com.arno.tech.spring.chatgpt.config.mode.GptMode;
 import com.arno.tech.spring.chatgpt.service.ChatService;
 import com.arno.tech.spring.telegram.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
@@ -156,7 +157,7 @@ public class TelegramManager {
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
-        chatService.doChat(question, answer -> {
+        chatService.doChat(question, GptMode.CHAT_TURBO, answer -> {
             SendMessage sendMessage = new SendMessage(chatId, answer);
             sendMessage.replyToMessageId(messageId);
             bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {

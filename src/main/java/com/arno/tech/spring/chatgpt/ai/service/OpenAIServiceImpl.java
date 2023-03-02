@@ -4,6 +4,7 @@ import com.arno.tech.spring.chatgpt.ai.IOpenAI;
 import com.arno.tech.spring.chatgpt.ai.config.ChatConfig;
 import com.arno.tech.spring.chatgpt.ai.model.aggregates.AIAnswer;
 import com.arno.tech.spring.chatgpt.ai.utils.OkHttpUtils;
+import com.arno.tech.spring.chatgpt.config.mode.GptMode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,47 @@ public class OpenAIServiceImpl implements IOpenAI {
         headers.put("Authorization", "Bearer " + openAiKey);
 
         AIAnswer aiAnswer = okHttpUtils.doPostApi("doChatGpt", "https://api.openai.com/v1/completions", headers, params, typeReference);
+        StringBuilder answers = new StringBuilder();
+        if (aiAnswer == null) {
+            consumer.accept("请求失败");
+            return;
+        }
+        List<AIAnswer.Choices> choices = aiAnswer.getChoices();
+        if (choices == null || choices.size() == 0) {
+            consumer.accept("请求失败");
+            return;
+        }
+        for (AIAnswer.Choices choice : choices) {
+            answers.append(choice.getText());
+        }
+        log.info("doChatGpt:aiAnswer{}", aiAnswer);
+        consumer.accept(answers.toString());
+    }
+
+    @Override
+    public void doChatGPT(String openAiKey, GptMode mode, String question, Consumer<String> consumer) {
+        JsonObject params = new JsonObject();
+        params.addProperty("model", mode.getValue());
+        params.addProperty("prompt", question);
+        params.addProperty("temperature", 0);
+        params.addProperty("max_tokens", 1024);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Authorization", "Bearer " + openAiKey);
+
+        String url = "https://api.openai.com/v1/completions";
+        switch (mode) {
+            case DAVINCI_3:
+                url = "https://api.openai.com/v1/engines/davinci/completions";
+                break;
+            case CHAT_TURBO:
+                url = "https://api.openai.com//v1/chat/completions";
+                break;
+            default:
+                break;
+        }
+        AIAnswer aiAnswer = okHttpUtils.doPostApi("doChatGpt", url, headers, params, typeReference);
         StringBuilder answers = new StringBuilder();
         if (aiAnswer == null) {
             consumer.accept("请求失败");

@@ -1,5 +1,7 @@
 package com.arno.tech.spring.chatgpt.ai;
 
+import com.arno.tech.spring.chatgpt.config.mode.GptMode;
+
 import javax.validation.constraints.NotNull;
 import java.util.function.Consumer;
 
@@ -29,4 +31,13 @@ public interface IOpenAI {
      */
     void doChatGPT(String openAiKey, String question, @NotNull Consumer<String> consumer);
 
+    /**
+     * ChatGPT 简单对话
+     *
+     * @param openAiKey
+     * @param mode
+     * @param question
+     * @param consumer
+     */
+    void doChatGPT(String openAiKey, GptMode mode, String question, Consumer<String> consumer);
 }

@@ -1,5 +1,7 @@
 package com.arno.tech.spring.chatgpt.service;
 
+import com.arno.tech.spring.chatgpt.config.mode.GptMode;
+
 import java.io.IOException;
 import java.util.function.Consumer;
 
@@ -27,4 +29,7 @@ public interface ChatService {
      * @throws IOException
      */
     void doChat(String question, Consumer<String> consumer);
+
+
+    void doChat(String question, GptMode mode, Consumer<String> consumer);
 }
