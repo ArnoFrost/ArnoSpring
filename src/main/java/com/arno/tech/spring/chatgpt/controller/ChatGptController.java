@@ -29,18 +29,18 @@ public class ChatGptController {
         this.chatService = chatService;
     }
 
-    @PostMapping("/chatgpt/chat")
-    public Result<String> chatGpt(@RequestParam Map<String, String> requestMapping) {
-        String question = requestMapping.get("question");
-        if (question == null || question.isEmpty()) {
-            return Result.error(GlobalError.PARAM_ERROR, "question is empty");
-        }
-        try {
-            String result = chatService.doChat(question);
-            return Result.succ(result);
-        } catch (IOException e) {
-            return Result.error(GlobalError.SYS_ERROR, e.getMessage());
-        }
-    }
+//    @PostMapping("/chatgpt/chat")
+//    public Result<String> chatGpt(@RequestParam Map<String, String> requestMapping) {
+//        String question = requestMapping.get("question");
+//        if (question == null || question.isEmpty()) {
+//            return Result.error(GlobalError.PARAM_ERROR, "question is empty");
+//        }
+//        try {
+//            String result = chatService.doText(question);
+//            return Result.succ(result);
+//        } catch (IOException e) {
+//            return Result.error(GlobalError.SYS_ERROR, e.getMessage());
+//        }
+//    }
 
 }

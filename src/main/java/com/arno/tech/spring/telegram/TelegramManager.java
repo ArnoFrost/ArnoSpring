@@ -157,7 +157,7 @@ public class TelegramManager {
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
-        chatService.doChat(question, GptMode.CHAT_TURBO, answer -> {
+        chatService.doChatByTurbo(question,  answer -> {
             SendMessage sendMessage = new SendMessage(chatId, answer);
             sendMessage.replyToMessageId(messageId);
             bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {

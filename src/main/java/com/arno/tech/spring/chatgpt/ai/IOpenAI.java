@@ -1,5 +1,6 @@
 package com.arno.tech.spring.chatgpt.ai;
 
+import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.arno.tech.spring.chatgpt.config.mode.GptMode;
 
 import javax.validation.constraints.NotNull;
@@ -12,15 +13,6 @@ import java.util.function.Consumer;
  * @since 2023/02/07
  */
 public interface IOpenAI {
-
-    /**
-     * ChatGPT 简单对话
-     *
-     * @param openAiKey
-     * @param question
-     * @return {@link String}
-     */
-    String doChatGPT(String openAiKey, String question);
 
     /**
      * ChatGPT 简单对话 异步
@@ -39,5 +31,5 @@ public interface IOpenAI {
      * @param question
      * @param consumer
      */
-    void doChatGPT(String openAiKey, GptMode mode, String question, Consumer<String> consumer);
+    void doChatByTurbo(String openAiKey, GptMode mode, String question, Consumer<ChatModelResponse> consumer);
 }

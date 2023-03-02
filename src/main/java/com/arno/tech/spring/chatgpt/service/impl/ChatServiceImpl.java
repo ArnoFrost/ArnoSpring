@@ -1,6 +1,7 @@
 package com.arno.tech.spring.chatgpt.service.impl;
 
 import com.arno.tech.spring.chatgpt.ai.IOpenAI;
+import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.arno.tech.spring.chatgpt.config.mode.GptMode;
 import com.arno.tech.spring.chatgpt.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,19 +29,18 @@ public class ChatServiceImpl implements ChatService {
         this.openAI = openAI;
     }
 
-
     @Override
-    public String doChat(String question) {
-        return openAI.doChatGPT(openAiKey, question);
-    }
-
-    @Override
-    public void doChat(String question, Consumer<String> consumer) {
+    public void doText(String question, Consumer<String> consumer) {
         openAI.doChatGPT(openAiKey, question, consumer);
     }
 
     @Override
-    public void doChat(String question, GptMode mode, Consumer<String> consumer) {
-        openAI.doChatGPT(openAiKey, mode, question, consumer);
+    public void doChatByMode(String question, GptMode mode, Consumer<ChatModelResponse> consumer) {
+        openAI.doChatByTurbo(openAiKey, mode, question, consumer);
+    }
+
+    @Override
+    public void doChatByTurbo(String question, Consumer<String> consumer) {
+        //TODO:xuxin14 2023/3/2
     }
 }

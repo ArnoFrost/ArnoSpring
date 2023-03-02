@@ -24,9 +24,9 @@ public class SpringBootRunTest {
 
     @Test
     public void test_openAi() throws IOException {
-//        String response = openAI.doChatGPT(openAiKey, "如果我有两个LinearLayout控件在上面的横滑控件里嵌套着,如何继续在上面的方案里,往最里层的LinearLayout添加元素?");
-        String response = openAI.doChatGPT(openAiKey, "帮我解释一下下面java 代码的含义");
-        logger.info("测试结果：{}", response);
+//        String response = openAI.doAIPostByMode(openAiKey, "如果我有两个LinearLayout控件在上面的横滑控件里嵌套着,如何继续在上面的方案里,往最里层的LinearLayout添加元素?");
+//        String response = openAI.doChatGPT(openAiKey, "帮我解释一下下面java 代码的含义");
+//        logger.info("测试结果：{}", response);
     }
 
 }
