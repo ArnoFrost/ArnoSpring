@@ -16,6 +16,7 @@ public interface ChatBotCommand {
      * text_help - 文本聊天帮助
      * gpt - gpt聊天
      * gpt_help - gpt聊天帮助
+     * gpt_clear - 清空gpt聊天记录
      * ```
      */
     String START = "/start";
@@ -25,10 +26,11 @@ public interface ChatBotCommand {
     String CHAT_GPT = "/gpt";
     String CHAT_GPT_HELP = "/gpt_help";
     String REGISTER = "/register";
+    String CHAT_GPT_CLEAR = "/gpt_clear";
 
     interface INFO {
         String CHAT_TEXT_HELP_INFO = "输入 /text + 你想说的话，例如：/text 你好";
-        String CHAT_GPT_HELP_INFO = "输入 /gpt + 你想说的话，例如：/gpt 你好";
+        String CHAT_GPT_HELP_INFO = "输入 /gpt + 你想说的话，例如：/gpt 你好，支持多轮对话~ 使用 /gpt_clear 清空聊天记录";
     }
 }
 

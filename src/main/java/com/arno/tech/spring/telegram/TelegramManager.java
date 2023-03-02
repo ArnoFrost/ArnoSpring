@@ -5,6 +5,9 @@ import com.arno.tech.spring.chatgpt.ai.vo.ChatVo;
 import com.arno.tech.spring.chatgpt.service.ChatService;
 import com.arno.tech.spring.telegram.config.ChatBotCommand;
 import com.arno.tech.spring.telegram.config.TgConfig;
+import com.arno.tech.spring.telegram.model.IChatCacheModel;
+import com.arno.tech.spring.telegram.model.bean.Chat;
+import com.arno.tech.spring.telegram.model.bean.Role;
 import com.arno.tech.spring.telegram.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
@@ -35,10 +38,13 @@ public class TelegramManager {
 
     private final LogUtils logUtils;
 
+    private final IChatCacheModel chatCacheModel;
+
     @Autowired
-    public TelegramManager(ChatService chatService, TgConfig config) {
+    public TelegramManager(ChatService chatService, TgConfig config, IChatCacheModel chatCacheModel) {
         this.chatService = chatService;
         this.config = config;
+        this.chatCacheModel = chatCacheModel;
         logUtils = new LogUtils();
     }
 
@@ -111,6 +117,14 @@ public class TelegramManager {
             answerByChatTurboAsync(bot, content, chatId, messageId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_HELP)) {
             answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_GPT_CLEAR)) {
+            //中断操作
+            if (!config.isInWhiteList(chatId)) {
+                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+                logUtils.log(LogUtils.LogLevel.WARN, config, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                return;
+            }
+            answerClear(bot, chatId);
         }
 
     }
@@ -158,6 +172,24 @@ public class TelegramManager {
         SendResponse execute = bot.execute(new SendMessage(chatId, answer));
         boolean ok = execute.isOk();
         logUtils.log(LogUtils.LogLevel.INFO, config, "answerHelp", chatId, "answerHelp is send ok = " + ok, null);
+    }
+
+    /**
+     * 清楚聊天记录
+     *
+     * @param bot    机器人
+     * @param chatId 聊天id
+     */
+    private void answerClear(TelegramBot bot, Long chatId) {
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerClear", chatId, "clear", null);
+        boolean result = chatCacheModel.deleteChat(chatId.toString());
+        String answer = "删除失败，请重试";
+        if (result) {
+            answer = "已删除聊天记录，请开始新一轮对话\nHave fun~";
+        }
+        SendResponse execute = bot.execute(new SendMessage(chatId, answer));
+        boolean ok = execute.isOk();
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerClear", chatId, "answerClear is send ok = " + ok, null);
     }
 
     /**
@@ -216,10 +248,20 @@ public class TelegramManager {
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
-        chatService.doChatByTurbo(question, (answer, msg) -> {
+        //region 组装一条数据
+        List<Chat> chat = chatCacheModel.getChat(chatId.toString());
+        chat.add(new Chat(Role.ROLE_USER, question, System.currentTimeMillis()));
+        //存入数据库
+        chatCacheModel.addChat(chatId.toString(), Role.ROLE_USER, question);
+        //endregion
+        chatService.doChatByTurbo(chat, (chatVo, msg) -> {
             SendMessage sendMessage;
-            if (answer != null) {
-                sendMessage = new SendMessage(chatId, parseAnswer(answer));
+            if (chatVo != null) {
+                //region 记录对话结果
+                String answer = parseAnswer(chatVo);
+                chatCacheModel.addChat(chatId.toString(), Role.ROLE_ASSISTANT, answer);
+                //endregion
+                sendMessage = new SendMessage(chatId, answer);
             } else {
                 sendMessage = new SendMessage(chatId, msg);
             }
@@ -255,11 +297,10 @@ public class TelegramManager {
         }
         StringBuilder sb = new StringBuilder();
         List<ChatModelResponse.Choice> choices = answer.getChoices();
-        sb.append("Chatgpt: ")
-                .append(choices.stream()
+        sb.append(choices.stream()
                         .skip(choices.size() - 1)
                         .limit(1)
-                        .findFirst().get().getMessage())
+                        .findFirst().get().getMessage().getContent())
                 .append("\n");
         return sb.toString();
     }

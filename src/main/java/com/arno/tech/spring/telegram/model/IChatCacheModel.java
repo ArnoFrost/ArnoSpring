@@ -2,6 +2,7 @@ package com.arno.tech.spring.telegram.model;
 
 import com.arno.tech.spring.telegram.model.bean.Chat;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -35,5 +36,6 @@ public interface IChatCacheModel {
      * @param uid uid
      * @return {@link List}<{@link Chat}>
      */
+    @NotNull
     List<Chat> getChat(String uid);
 }

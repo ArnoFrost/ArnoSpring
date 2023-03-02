@@ -8,6 +8,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,12 +45,17 @@ public class ChatCacheModel implements IChatCacheModel {
     }
 
     @Override
-    public List<Chat> getChat(String uid) {
-        String temp = getString(uid);
+    public @NotNull List<Chat> getChat(String uid) {
+        String temp = getString(RedisKey.KEY_PREFIX + uid);
         if (StringUtil.isNotEmpty(temp)) {
-            return JacksonUtils.stringToBean(temp, List.class);
+            List<Chat> list = JacksonUtils.stringToList(temp, Chat.class);
+            if (list == null) {
+                return new ArrayList<>();
+            } else {
+                return list;
+            }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private void setString(String key, String value) {
@@ -57,7 +63,12 @@ public class ChatCacheModel implements IChatCacheModel {
     }
 
     private String getString(String key) {
-        return redissonClient.getBucket(key).get().toString();
+        Object result = redissonClient.getBucket(key).get();
+        if (result == null) {
+            return null;
+        } else {
+            return result.toString();
+        }
     }
 
     private boolean delete(String key) {

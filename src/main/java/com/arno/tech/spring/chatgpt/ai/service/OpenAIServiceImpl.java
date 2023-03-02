@@ -6,6 +6,7 @@ import com.arno.tech.spring.chatgpt.ai.model.AIModel;
 import com.arno.tech.spring.chatgpt.ai.model.IAIModel;
 import com.arno.tech.spring.chatgpt.ai.model.aggregates.AIAnswer;
 import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
+import com.arno.tech.spring.telegram.model.bean.Chat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,26 @@ public class OpenAIServiceImpl implements IOpenAI {
     public void doChatByTurbo(String openAiKey, String question, @NotNull OpenAiResult<ChatModelResponse> consumer) {
 
         model.doChatByTurbo(openAiKey, question, chatModelResponse -> {
+            //TODO:xuxin14 2023/3/2 调整逻辑拦截
+//                log.info("doChatByTurbo:aiAnswer{}", aiAnswer);
+            StringBuilder answers = new StringBuilder();
+            if (chatModelResponse == null) {
+                consumer.onResult(null, "请求失败");
+                return;
+            }
+            List<ChatModelResponse.Choice> choices = chatModelResponse.getChoices();
+            if (choices == null || choices.size() == 0) {
+                consumer.onResult(null, "请求失败");
+                return;
+            }
+            consumer.onResult(chatModelResponse, "成功");
+
+        });
+    }
+
+    @Override
+    public void doChatByTurbo(String openAiKey, List<Chat> chats, OpenAiResult<ChatModelResponse> consumer) {
+        model.doChatByTurbo(openAiKey, chats, chatModelResponse -> {
             //TODO:xuxin14 2023/3/2 调整逻辑拦截
 //                log.info("doChatByTurbo:aiAnswer{}", aiAnswer);
             StringBuilder answers = new StringBuilder();

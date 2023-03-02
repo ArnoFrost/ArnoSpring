@@ -19,11 +19,18 @@ public class CacheService implements ICacheService {
         this.redissonClient = redissonClient;
     }
 
+    @Override
     public void setString(String key, String value) {
         redissonClient.getBucket(key).set(value);
     }
 
+    @Override
     public String getString(String key) {
         return redissonClient.getBucket(key).get().toString();
+    }
+
+    @Override
+    public boolean delete(String key) {
+        return redissonClient.getBucket(key).delete();
     }
 }

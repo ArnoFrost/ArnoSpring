@@ -5,6 +5,8 @@ import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.arno.tech.spring.chatgpt.ai.utils.OkHttpUtils;
 import com.arno.tech.spring.chatgpt.config.constant.OpenAIUrl;
 import com.arno.tech.spring.chatgpt.config.mode.GptMode;
+import com.arno.tech.spring.telegram.model.bean.Chat;
+import com.arno.tech.spring.telegram.model.bean.Role;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -55,9 +58,17 @@ public class AIModel implements IAIModel {
     public void doChatByTurbo(String openAiKey, String question, Consumer<ChatModelResponse> consumer) {
         JsonObject requestJson = new JsonObject();
         requestJson.addProperty("model", GptMode.CHAT_TURBO.getValue());
-        JsonArray message = new JsonArray();
-        message.add(getUserMessage(question));
-        requestJson.add("messages", message);
+        requestJson.add("messages", buildUserMessage(question));
+        requestJson.addProperty("temperature", 0);
+        requestJson.addProperty("max_tokens", 1024);
+        requestApi("doChatByTurbo", openAiKey, OpenAIUrl.URL_CHAT_TURBO, requestJson, chatReference, consumer);
+    }
+
+    @Override
+    public void doChatByTurbo(String openAiKey, List<Chat> chats, Consumer<ChatModelResponse> consumer) {
+        JsonObject requestJson = new JsonObject();
+        requestJson.addProperty("model", GptMode.CHAT_TURBO.getValue());
+        requestJson.add("messages", buildUserMessage(chats));
         requestJson.addProperty("temperature", 0);
         requestJson.addProperty("max_tokens", 1024);
         requestApi("doChatByTurbo", openAiKey, OpenAIUrl.URL_CHAT_TURBO, requestJson, chatReference, consumer);
@@ -72,11 +83,37 @@ public class AIModel implements IAIModel {
         okHttpUtils.doPostApi(tag, url, headers, requestJson, typeReference, consumer);
     }
 
-    private static JsonObject getUserMessage(String question) {
+    /**
+     * 建立用户信息
+     *
+     * @param question 问题
+     * @return {@link JsonArray}
+     */
+    private static JsonArray buildUserMessage(String question) {
+        JsonArray message = new JsonArray();
         JsonObject userMessage = new JsonObject();
         userMessage.addProperty("content", question);
-        userMessage.addProperty("role", "user");
-        return userMessage;
+        userMessage.addProperty("role", Role.ROLE_USER);
+        message.add(userMessage);
+        return message;
+    }
+
+
+    /**
+     * 建立用户信息
+     *
+     * @param chat 闲谈，聊天
+     * @return {@link JsonArray}
+     */
+    private static JsonArray buildUserMessage(List<Chat> chat) {
+        JsonArray message = new JsonArray();
+        for (Chat c : chat) {
+            JsonObject userMessage = new JsonObject();
+            userMessage.addProperty("content", c.getContent());
+            userMessage.addProperty("role", c.getRole());
+            message.add(userMessage);
+        }
+        return message;
     }
     //endregion
 }
