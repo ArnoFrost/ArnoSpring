@@ -4,7 +4,6 @@ import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.arno.tech.spring.chatgpt.config.mode.GptMode;
 
 import javax.validation.constraints.NotNull;
-import java.util.function.Consumer;
 
 /**
  * OpenAI 接口
@@ -21,15 +20,14 @@ public interface IOpenAI {
      * @param question
      * @param consumer
      */
-    void doChatGPT(String openAiKey, String question, @NotNull Consumer<String> consumer);
+    void doByText3(String openAiKey, String question, @NotNull OpenAiResult<String> consumer);
 
     /**
      * ChatGPT 简单对话
      *
      * @param openAiKey
-     * @param mode
      * @param question
      * @param consumer
      */
-    void doChatByTurbo(String openAiKey, GptMode mode, String question, Consumer<ChatModelResponse> consumer);
+    void doChatByTurbo(String openAiKey, String question, @NotNull OpenAiResult<ChatModelResponse> consumer);
 }

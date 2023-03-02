@@ -157,8 +157,13 @@ public class TelegramManager {
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
-        chatService.doChatByTurbo(question,  answer -> {
-            SendMessage sendMessage = new SendMessage(chatId, answer);
+        chatService.doText(question, (answer, msg) -> {
+            SendMessage sendMessage;
+            if (answer != null) {
+                sendMessage = new SendMessage(chatId, answer);
+            } else {
+                sendMessage = new SendMessage(chatId, msg);
+            }
             sendMessage.replyToMessageId(messageId);
             bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
                 @Override
@@ -176,6 +181,7 @@ public class TelegramManager {
                 }
             });
         });
+
 
     }
 

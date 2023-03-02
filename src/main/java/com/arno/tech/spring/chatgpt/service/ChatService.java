@@ -1,10 +1,7 @@
 package com.arno.tech.spring.chatgpt.service;
 
-import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
-import com.arno.tech.spring.chatgpt.config.mode.GptMode;
-
-import java.io.IOException;
-import java.util.function.Consumer;
+import com.arno.tech.spring.chatgpt.ai.OpenAiResult;
+import com.arno.tech.spring.chatgpt.ai.vo.ChatVo;
 
 /**
  * 聊天服务
@@ -19,19 +16,9 @@ public interface ChatService {
      *
      * @param question
      * @param consumer
-     * @throws IOException
      */
-    void doText(String question, Consumer<String> consumer);
+    void doText(String question, OpenAiResult<String> consumer);
 
-
-    /**
-     * 按照模式异步请求
-     *
-     * @param question
-     * @param mode
-     * @param consumer
-     */
-    void doChatByMode(String question, GptMode mode, Consumer<ChatModelResponse> consumer);
 
     /**
      * 按照模式异步请求
@@ -39,5 +26,5 @@ public interface ChatService {
      * @param question
      * @param consumer
      */
-    void doChatByTurbo(String question, Consumer<String> consumer);
+    void doChatByTurbo(String question, OpenAiResult<ChatVo> consumer);
 }
