@@ -95,6 +95,8 @@ public class TelegramManager {
             answerHelp(bot, ChatBotCommand.START, chatId);
         } else if (text.startsWith(ChatBotCommand.HELP)) {
             answerHelp(bot, ChatBotCommand.HELP, chatId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_TEXT_HELP)) {
+            answerHelp(bot, ChatBotCommand.CHAT_TEXT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_TEXT)) {
             //中断操作
             if (!config.isInWhiteList(chatId)) {
@@ -104,17 +106,6 @@ public class TelegramManager {
             }
             content = text.substring(ChatBotCommand.CHAT_TEXT.length());
             answerByTextAsync(bot, content, chatId, messageId);
-        } else if (text.startsWith(ChatBotCommand.CHAT_TEXT_HELP)) {
-            answerHelp(bot, ChatBotCommand.CHAT_TEXT_HELP, chatId);
-        } else if (text.startsWith(ChatBotCommand.CHAT_GPT)) {
-            //中断操作
-            if (!config.isInWhiteList(chatId)) {
-                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
-                logUtils.log(LogUtils.LogLevel.WARN, config, "dispatchUpdate", chatId, "chatId is not in white list", null);
-                return;
-            }
-            content = text.substring(ChatBotCommand.CHAT_GPT.length());
-            answerByChatTurboAsync(bot, content, chatId, messageId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_HELP)) {
             answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_CLEAR)) {
@@ -125,6 +116,15 @@ public class TelegramManager {
                 return;
             }
             answerClear(bot, chatId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_GPT)) {
+            //中断操作
+            if (!config.isInWhiteList(chatId)) {
+                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+                logUtils.log(LogUtils.LogLevel.WARN, config, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                return;
+            }
+            content = text.substring(ChatBotCommand.CHAT_GPT.length());
+            answerByChatTurboAsync(bot, content, chatId, messageId);
         }
 
     }

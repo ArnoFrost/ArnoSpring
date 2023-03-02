@@ -41,7 +41,8 @@ public class ChatCacheModel implements IChatCacheModel {
 
     @Override
     public boolean deleteChat(String uid) {
-        return delete(uid);
+        setString(RedisKey.KEY_PREFIX + uid, "");
+        return true;
     }
 
     @Override
