@@ -10,10 +10,16 @@ public interface ChatBotCommand {
 
     String START = "/start";
     String HELP = "/help";
-    String CHAT_GPT = "/chatgpt";
-    String CHAT_GPT_HELP = "/chatgpt_help";
-    String CHAT_GPT_HELP_INFO = "输入 /chatgpt + 你想说的话，例如：/chatgpt 你好";
-    String CHAT_GPT_REGISTER = "/chatgpt_register";
+    String CHAT_TEXT = "/text";
+    String CHAT_TEXT_HELP = "/text_help";
+    String CHAT_GPT = "/gpt";
+    String CHAT_GPT_HELP = "/gpt_help";
+    String REGISTER = "/register";
 
-    String CHAT_WEATHER = "/chat_weather";
+    interface INFO {
+        String CHAT_TEXT_HELP_INFO = "输入 /text + 你想说的话，例如：/text 你好";
+        String CHAT_GPT_HELP_INFO = "输入 /gpt + 你想说的话，例如：/gpt 你好";
+    }
 }
+
+

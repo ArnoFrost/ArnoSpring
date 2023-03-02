@@ -1,6 +1,5 @@
 package com.arno.tech.spring.telegram;
 
-import com.arno.tech.spring.chatgpt.config.mode.GptMode;
 import com.arno.tech.spring.chatgpt.service.ChatService;
 import com.arno.tech.spring.telegram.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
@@ -85,17 +84,28 @@ public class TelegramManager {
             answerHelp(bot, ChatBotCommand.START, chatId);
         } else if (text.startsWith(ChatBotCommand.HELP)) {
             answerHelp(bot, ChatBotCommand.HELP, chatId);
-        } else if (text.startsWith(ChatBotCommand.CHAT_GPT_HELP)) {
-            answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_TEXT)) {
+            //中断操作
+            if (!config.isInWhiteList(chatId)) {
+                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+                logUtils.log(LogUtils.LogLevel.WARN, config, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                return;
+            }
+            content = text.substring(ChatBotCommand.CHAT_TEXT.length());
+            answerByTextAsync(bot, content, chatId, messageId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_TEXT_HELP)) {
+            answerHelp(bot, ChatBotCommand.CHAT_TEXT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT)) {
             //中断操作
             if (!config.isInWhiteList(chatId)) {
-                answerHelp(bot, ChatBotCommand.CHAT_GPT_REGISTER, chatId);
+                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, config, "dispatchUpdate", chatId, "chatId is not in white list", null);
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_GPT.length());
-            answerByChatGptAsync(bot, content, chatId, messageId);
+            answerByChatTurboAsync(bot, content, chatId, messageId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_GPT_HELP)) {
+            answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
         }
 
     }
@@ -127,9 +137,12 @@ public class TelegramManager {
                         "/chatgpt_help 机器人聊天帮助\n";
                 break;
             case ChatBotCommand.CHAT_GPT_HELP:
-                answer = ChatBotCommand.CHAT_GPT_HELP_INFO;
+                answer = ChatBotCommand.INFO.CHAT_GPT_HELP_INFO;
                 break;
-            case ChatBotCommand.CHAT_GPT_REGISTER:
+            case ChatBotCommand.CHAT_TEXT_HELP:
+                answer = ChatBotCommand.INFO.CHAT_TEXT_HELP_INFO;
+                break;
+            case ChatBotCommand.REGISTER:
                 logUtils.log(LogUtils.LogLevel.WARN, config, "answerHelp", chatId, "chatId = " + chatId + " 未注册", null);
                 answer = "白名单机制开启,请向管理员Arno 反馈本次会话 id : \n" + chatId;
                 break;
@@ -143,17 +156,17 @@ public class TelegramManager {
     }
 
     /**
-     * 异步chatgpt聊天
+     * 异步text文本
      *
      * @param bot      botApi
      * @param question 问题
      * @param chatId   对话Id
      */
-    private void answerByChatGptAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
-        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
+    private void answerByTextAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByTextAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
-            logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatGptAsync", chatId, "question is null", null);
+            logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByTextAsync", chatId, "question is null", null);
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
@@ -169,22 +182,60 @@ public class TelegramManager {
                 @Override
                 public void onResponse(SendMessage request, SendResponse response) {
                     if (response.isOk()) {
-                        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatGptAsync", chatId, "answerByChatGptAsync send message ok", null);
+                        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByTextAsync", chatId, "send message ok", null);
                     } else {
-                        logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatGptAsync", chatId, "answerByChatGptAsync send message error, code = " + response.errorCode() + ", description = " + response.description(), null);
+                        logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByTextAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description(), null);
                     }
                 }
 
                 @Override
                 public void onFailure(SendMessage request, IOException e) {
-                    logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatGptAsync", chatId, "answerByChatGptAsync send message error", e);
+                    logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByTextAsync", chatId, "send message error", e);
                 }
             });
         });
-
-
     }
 
+    /**
+     * 异步text文本
+     *
+     * @param bot      botApi
+     * @param question 问题
+     * @param chatId   对话Id
+     */
+    private void answerByChatTurboAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
+        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatTurboAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
+        sendState(chatId, ChatAction.typing);
+        if (StringUtils.isEmpty(question)) {
+            logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatTurboAsync", chatId, "question is null", null);
+            bot.execute(new SendMessage(chatId, "请输入内容"));
+            return;
+        }
+        chatService.doText(question, (answer, msg) -> {
+            SendMessage sendMessage;
+            if (answer != null) {
+                sendMessage = new SendMessage(chatId, answer);
+            } else {
+                sendMessage = new SendMessage(chatId, msg);
+            }
+            sendMessage.replyToMessageId(messageId);
+            bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
+                @Override
+                public void onResponse(SendMessage request, SendResponse response) {
+                    if (response.isOk()) {
+                        logUtils.log(LogUtils.LogLevel.INFO, config, "answerByChatTurboAsync", chatId, "send message ok", null);
+                    } else {
+                        logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatTurboAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description(), null);
+                    }
+                }
+
+                @Override
+                public void onFailure(SendMessage request, IOException e) {
+                    logUtils.log(LogUtils.LogLevel.ERROR, config, "answerByChatTurboAsync", chatId, "send message error", e);
+                }
+            });
+        });
+    }
 
     /**
      * 状态更新
