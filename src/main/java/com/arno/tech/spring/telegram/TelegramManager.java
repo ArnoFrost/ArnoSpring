@@ -1,5 +1,7 @@
 package com.arno.tech.spring.telegram;
 
+import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
+import com.arno.tech.spring.chatgpt.ai.vo.ChatVo;
 import com.arno.tech.spring.chatgpt.service.ChatService;
 import com.arno.tech.spring.telegram.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Telegram 管理
@@ -211,10 +214,10 @@ public class TelegramManager {
             bot.execute(new SendMessage(chatId, "请输入内容"));
             return;
         }
-        chatService.doText(question, (answer, msg) -> {
+        chatService.doChatByTurbo(question, (answer, msg) -> {
             SendMessage sendMessage;
             if (answer != null) {
-                sendMessage = new SendMessage(chatId, answer);
+                sendMessage = new SendMessage(chatId, parseAnswer(answer));
             } else {
                 sendMessage = new SendMessage(chatId, msg);
             }
@@ -235,6 +238,28 @@ public class TelegramManager {
                 }
             });
         });
+    }
+
+    /**
+     * 答案解析
+     *
+     * @param answer 回答
+     * @return {@link String}
+     */
+    private String parseAnswer(ChatVo answer) {
+        System.out.println(answer);
+        if (answer == null) {
+            return "未知错误";
+        }
+        StringBuilder sb = new StringBuilder();
+        List<ChatModelResponse.Choice> choices = answer.getChoices();
+        sb.append("Chatgpt: ")
+                .append(choices.stream()
+                        .skip(choices.size() - 1)
+                        .limit(1)
+                        .findFirst().get().getMessage())
+                .append("\n");
+        return sb.toString();
     }
 
     /**

@@ -3,10 +3,12 @@ package com.arno.tech.spring.chatgpt.ai.vo;
 import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
+@ToString
 public class ChatVo {
     private String id;
     private String object;
@@ -17,6 +19,7 @@ public class ChatVo {
 
 
     @Data
+    @ToString
     public static class Usage {
         private int promptTokens;
         private int completionTokens;
@@ -32,6 +35,7 @@ public class ChatVo {
     }
 
     @Data
+    @ToString
     public static class Message {
         private String role;
         private String content;

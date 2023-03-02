@@ -7,7 +7,17 @@ package com.arno.tech.spring.telegram;
  * @since 2023/02/07
  */
 public interface ChatBotCommand {
-
+    /**
+     * ```telegram command
+     * register - 注册
+     * start - 开始
+     * help - 帮助
+     * text - 文本聊天
+     * text_help - 文本聊天帮助
+     * gpt - gpt聊天
+     * gpt_help - gpt聊天帮助
+     * ```
+     */
     String START = "/start";
     String HELP = "/help";
     String CHAT_TEXT = "/text";

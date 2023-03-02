@@ -53,13 +53,14 @@ public class AIModel implements IAIModel {
 
     @Override
     public void doChatByTurbo(String openAiKey, String question, Consumer<ChatModelResponse> consumer) {
-        JsonObject params = new JsonObject();
-        params.addProperty("model", GptMode.CHAT_TURBO.getValue());
+        JsonObject requestJson = new JsonObject();
+        requestJson.addProperty("model", GptMode.CHAT_TURBO.getValue());
         JsonArray message = new JsonArray();
         message.add(getUserMessage(question));
-        params.addProperty("temperature", 0);
-        params.addProperty("max_tokens", 1024);
-        requestApi("doChatByTurbo", openAiKey, OpenAIUrl.URL_CHAT_TURBO, params, chatReference, consumer);
+        requestJson.add("messages", message);
+        requestJson.addProperty("temperature", 0);
+        requestJson.addProperty("max_tokens", 1024);
+        requestApi("doChatByTurbo", openAiKey, OpenAIUrl.URL_CHAT_TURBO, requestJson, chatReference, consumer);
     }
 
 
