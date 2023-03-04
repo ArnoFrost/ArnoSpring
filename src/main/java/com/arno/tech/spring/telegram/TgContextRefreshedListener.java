@@ -18,11 +18,11 @@ public class TgContextRefreshedListener implements ApplicationListener<ContextRe
     /**
      * 环境配置
      */
-    private final TelegramManager telegramManager;
+    private final TelegramBotManager telegramBotManager;
 
     @Autowired
-    public TgContextRefreshedListener(TelegramManager telegramManager) {
-        this.telegramManager = telegramManager;
+    public TgContextRefreshedListener(TelegramBotManager telegramBotManager) {
+        this.telegramBotManager = telegramBotManager;
     }
 
     /**
@@ -32,6 +32,6 @@ public class TgContextRefreshedListener implements ApplicationListener<ContextRe
      */
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        telegramManager.init();
+        telegramBotManager.init();
     }
 }

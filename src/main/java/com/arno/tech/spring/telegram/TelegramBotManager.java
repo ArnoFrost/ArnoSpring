@@ -8,7 +8,7 @@ import com.arno.tech.spring.telegram.config.TgConfig;
 import com.arno.tech.spring.telegram.model.IChatCacheModel;
 import com.arno.tech.spring.telegram.model.bean.Chat;
 import com.arno.tech.spring.telegram.model.bean.Role;
-import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.base.utils.LogUtils;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -31,7 +31,7 @@ import java.util.List;
  * @since 2023/02/07
  */
 @Component
-public class TelegramManager {
+public class TelegramBotManager {
     private final ChatService chatService;
     private final TgConfig config;
     private TelegramBot bot;
@@ -41,7 +41,7 @@ public class TelegramManager {
     private final IChatCacheModel chatCacheModel;
 
     @Autowired
-    public TelegramManager(ChatService chatService, TgConfig config, IChatCacheModel chatCacheModel) {
+    public TelegramBotManager(ChatService chatService, TgConfig config, IChatCacheModel chatCacheModel) {
         this.chatService = chatService;
         this.config = config;
         this.chatCacheModel = chatCacheModel;
