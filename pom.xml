@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.arno.tech</groupId>
-    <artifactId>ArnoSpring</artifactId>
+    <artifactId>ChatgptBot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ArnoSpring</name>
-    <description>ArnoSpring</description>
+    <name>ChatgptBot</name>
+    <description>ChatgptBot</description>
     <properties>
         <java.version>1.8</java.version>
         <okhttp.version>4.10.0</okhttp.version>

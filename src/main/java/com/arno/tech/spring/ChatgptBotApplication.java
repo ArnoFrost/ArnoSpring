@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @since 2023/02/02
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-public class ArnoSpringApplication {
+public class ChatgptBotApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ArnoSpringApplication.class, args);
+        SpringApplication.run(ChatgptBotApplication.class, args);
     }
 
 }
