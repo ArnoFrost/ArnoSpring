@@ -1,6 +1,7 @@
 package com.arno.tech.spring.user.service;
 
 import com.arno.tech.spring.user.model.IUserModel;
+import com.arno.tech.spring.user.model.bean.Role;
 import com.arno.tech.spring.user.model.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,5 +46,28 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public boolean unBanUser(long id) {
         return userModel.changeUserStatus(id, 0);
+    }
+
+    @Override
+    public boolean isAdmin(long id) {
+        User userInfo = userModel.getUserInfo(id);
+        return userInfo != null && userInfo.getRole() == Role.ADMIN;
+    }
+
+    @Override
+    public boolean isValidUser(Long id) {
+        User userInfo = userModel.getUserInfo(id);
+        return userInfo != null && userInfo.getStatus() == 0;
+    }
+
+    @Override
+    public String getUserNameByChatId(Long chatId) {
+        List<User> userList = userModel.getUserList();
+        for (User user : userList) {
+            if (user.getId().equals(chatId)) {
+                return user.getName();
+            }
+        }
+        return null;
     }
 }

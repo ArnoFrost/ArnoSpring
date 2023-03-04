@@ -1,11 +1,13 @@
 package com.arno.tech.spring.telegram;
 
+import com.arno.tech.spring.telegram.config.TgConfig;
+import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.user.service.IUserInfoService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * TG 启动运行器
@@ -20,9 +22,15 @@ public class TgContextRefreshedListener implements ApplicationListener<ContextRe
      */
     private final TelegramBotManager telegramBotManager;
 
+    private final TgConfig config;
+
+    private final IUserInfoService userInfoService;
+
     @Autowired
-    public TgContextRefreshedListener(TelegramBotManager telegramBotManager) {
+    public TgContextRefreshedListener(TelegramBotManager telegramBotManager, TgConfig config, IUserInfoService userInfoService) {
         this.telegramBotManager = telegramBotManager;
+        this.config = config;
+        this.userInfoService = userInfoService;
     }
 
     /**
@@ -33,5 +41,7 @@ public class TgContextRefreshedListener implements ApplicationListener<ContextRe
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
         telegramBotManager.init();
+        LogUtils.getInstance().setConfig(config);
+        LogUtils.getInstance().setUserInfoService(userInfoService);
     }
 }

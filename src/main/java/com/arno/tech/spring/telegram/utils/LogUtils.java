@@ -1,9 +1,8 @@
 package com.arno.tech.spring.telegram.utils;
 
 import com.arno.tech.spring.telegram.config.TgConfig;
+import com.arno.tech.spring.user.service.IUserInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * 日志工具
@@ -12,25 +11,45 @@ import org.springframework.stereotype.Component;
  * @since 2023/02/07
  */
 @Slf4j
-@Component
 public class LogUtils {
-    private final TgConfig config;
+    private TgConfig config;
 
-    @Autowired
+    private IUserInfoService userInfoService;
+
+    private LogUtils() {
+
+    }
+
+    public static LogUtils getInstance() {
+        return LogUtilsHolder.INSTANCE;
+    }
+
+    private static class LogUtilsHolder {
+        private static final LogUtils INSTANCE = new LogUtils();
+    }
+
     public LogUtils(TgConfig config) {
         this.config = config;
     }
 
+    public void setUserInfoService(IUserInfoService userInfoService) {
+        this.userInfoService = userInfoService;
+    }
+
+    public void setConfig(TgConfig config) {
+        this.config = config;
+    }
+
     public void log(int logLevel, String tag, Long chatId, String str, Exception e) {
-        if (config.isWhiteEnable()) {
+        if (config != null && config.isWhiteEnable()) {
             if (logLevel == LogLevel.DEBUG) {
-                log.debug("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.debug("{}: chatId = {}, user = {}, {}", tag, chatId, getUserNameByChatId(chatId), str, e);
             } else if (logLevel == LogLevel.INFO) {
-                log.info("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.info("{}: chatId = {}, user = {}, {}", tag, chatId, getUserNameByChatId(chatId), str, e);
             } else if (logLevel == LogLevel.WARN) {
-                log.warn("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.warn("{}: chatId = {}, user = {}, {}", tag, chatId, getUserNameByChatId(chatId), str, e);
             } else if (logLevel == LogLevel.ERROR) {
-                log.error("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
+                log.error("{}: chatId = {}, user = {}, {}", tag, chatId, getUserNameByChatId(chatId), str, e);
             }
         } else {
             if (logLevel == LogLevel.DEBUG) {
@@ -43,6 +62,13 @@ public class LogUtils {
                 log.error("{}: chatId = {}, {}", tag, chatId, str, e);
             }
         }
+    }
+
+    private String getUserNameByChatId(Long chatId) {
+        if (userInfoService == null) {
+            return "";
+        }
+        return userInfoService.getUserNameByChatId(chatId);
     }
 
     /**

@@ -28,9 +28,9 @@ public class UserModel implements IUserModel {
     private final LogUtils logUtils;
 
     @Autowired
-    public UserModel(CacheService cacheService, LogUtils logUtils) {
+    public UserModel(CacheService cacheService) {
         this.cacheService = cacheService;
-        this.logUtils = logUtils;
+        this.logUtils = LogUtils.getInstance();
     }
 
     //region 共有方法

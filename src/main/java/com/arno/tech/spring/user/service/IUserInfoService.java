@@ -21,4 +21,10 @@ public interface IUserInfoService {
     boolean banUser(long id);
 
     boolean unBanUser(long id);
+
+    boolean isAdmin(long id);
+
+    boolean isValidUser(Long id);
+
+    String getUserNameByChatId(Long chatId);
 }

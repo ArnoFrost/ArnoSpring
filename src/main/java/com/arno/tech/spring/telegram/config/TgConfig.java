@@ -58,21 +58,6 @@ public class TgConfig {
         return whiteMap.get(chatId.toString());
     }
 
-    /**
-     * 是否在白名单中
-     *
-     * @param chatId 对话id
-     * @return {@link boolean}
-     */
-    public boolean isInWhiteList(Long chatId) {
-        if (chatId == null) {
-            return false;
-        }
-        if (whiteEnable) {
-            return whiteMap.containsKey(chatId.toString());
-        }
-        return true;
-    }
 
     @Data
     public static class Admin {

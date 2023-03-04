@@ -10,6 +10,7 @@ import com.arno.tech.spring.telegram.model.IChatCacheModel;
 import com.arno.tech.spring.telegram.model.bean.Chat;
 import com.arno.tech.spring.telegram.model.bean.Role;
 import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.user.service.IUserInfoService;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -18,7 +19,6 @@ import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -36,19 +36,22 @@ public class ChatBotService implements IChatBotService {
     private final TgConfig config;
     private final IChatCacheModel chatCacheModel;
     private final ChatService chatService;
-    private final LogUtils logUtils;
-    private final HelpInfo helpInfo;
     private TelegramBot bot;
+    private final IUserInfoService userInfoService;
+    private final HelpInfo helpInfo;
 
+    private final LogUtils logUtils;
 
-    @Autowired
-    public ChatBotService(TgConfig config, IChatCacheModel chatCacheModel, ChatService chatService, LogUtils logUtils, HelpInfo helpInfo) {
+    public ChatBotService(TgConfig config, IChatCacheModel chatCacheModel, ChatService chatService
+            , IUserInfoService userInfoService, HelpInfo helpInfo) {
         this.config = config;
         this.chatCacheModel = chatCacheModel;
         this.chatService = chatService;
-        this.logUtils = logUtils;
+        this.userInfoService = userInfoService;
         this.helpInfo = helpInfo;
+        this.logUtils = LogUtils.getInstance();
     }
+
 
     @Override
     public void init() {
@@ -98,7 +101,7 @@ public class ChatBotService implements IChatBotService {
             answerHelp(bot, ChatBotCommand.CHAT_TEXT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_TEXT)) {
             //中断操作
-            if (!config.isInWhiteList(chatId)) {
+            if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
                 return;
@@ -109,7 +112,7 @@ public class ChatBotService implements IChatBotService {
             answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_CLEAR)) {
             //中断操作
-            if (!config.isInWhiteList(chatId)) {
+            if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
                 return;
@@ -117,7 +120,7 @@ public class ChatBotService implements IChatBotService {
             answerClear(bot, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT)) {
             //中断操作
-            if (!config.isInWhiteList(chatId)) {
+            if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
                 return;
@@ -128,7 +131,7 @@ public class ChatBotService implements IChatBotService {
             // 兜底改进用gpt 命令处理
 
             //中断操作
-            if (!config.isInWhiteList(chatId)) {
+            if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
                 return;
@@ -315,5 +318,9 @@ public class ChatBotService implements IChatBotService {
     private void sendState(Long chatId, ChatAction chatAction) {
         SendChatAction sendChatAction = new SendChatAction(chatId, chatAction);
         bot.execute(sendChatAction);
+    }
+
+    private boolean isValidUser(Long chatId) {
+        return userInfoService.isValidUser(chatId);
     }
 }

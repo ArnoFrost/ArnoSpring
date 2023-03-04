@@ -25,11 +25,11 @@ public class TelegramBotManager {
     private final IChatAdminBotService adminBotService;
 
     @Autowired
-    public TelegramBotManager(TgConfig config, ChatBotService chatBotService, ChatAdminBotService adminBotService, LogUtils logUtils) {
+    public TelegramBotManager(TgConfig config, ChatBotService chatBotService, ChatAdminBotService adminBotService) {
         this.config = config;
         this.chatBotService = chatBotService;
         this.adminBotService = adminBotService;
-        this.logUtils = logUtils;
+        this.logUtils = LogUtils.getInstance();
     }
 
     /**
