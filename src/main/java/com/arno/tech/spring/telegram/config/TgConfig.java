@@ -42,6 +42,8 @@ public class TgConfig {
      */
     private Map<String, String> whiteMap;
 
+    private Admin admin;
+
 
     /**
      * 获取用户名
@@ -70,5 +72,12 @@ public class TgConfig {
             return whiteMap.containsKey(chatId.toString());
         }
         return true;
+    }
+
+    @Data
+    public static class Admin {
+        private String name;
+        private String token;
+        private String id;
     }
 }

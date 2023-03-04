@@ -1,7 +1,9 @@
-package com.arno.tech.spring.base.utils;
+package com.arno.tech.spring.telegram.utils;
 
 import com.arno.tech.spring.telegram.config.TgConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 日志工具
@@ -10,8 +12,16 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2023/02/07
  */
 @Slf4j
+@Component
 public class LogUtils {
-    public void log(int logLevel, TgConfig config, String tag, Long chatId, String str, Exception e) {
+    private final TgConfig config;
+
+    @Autowired
+    public LogUtils(TgConfig config) {
+        this.config = config;
+    }
+
+    public void log(int logLevel, String tag, Long chatId, String str, Exception e) {
         if (config.isWhiteEnable()) {
             if (logLevel == LogLevel.DEBUG) {
                 log.debug("{}: chatId = {}, user = {}, {}", tag, chatId, config.getUserNameByChatId(chatId), str, e);
