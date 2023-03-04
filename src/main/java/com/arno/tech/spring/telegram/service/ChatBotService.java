@@ -10,6 +10,7 @@ import com.arno.tech.spring.telegram.model.IChatCacheModel;
 import com.arno.tech.spring.telegram.model.bean.Chat;
 import com.arno.tech.spring.telegram.model.bean.Role;
 import com.arno.tech.spring.base.utils.LogUtils;
+import com.arno.tech.spring.telegram.utils.TgApiUtils;
 import com.arno.tech.spring.user.service.IUserInfoService;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
@@ -173,9 +174,8 @@ public class ChatBotService implements IChatBotService {
                 answer = ChatBotCommand.INFO.UNKNOWN_INFO;
                 break;
         }
-        SendResponse execute = bot.execute(new SendMessage(chatId, answer));
-        boolean ok = execute.isOk();
-        logUtils.log(LogUtils.LogLevel.INFO, "answerHelp", chatId, "answerHelp is send ok = " + ok);
+
+        replyMessage("answerClear", chatId, null, answer);
     }
 
     /**
@@ -191,9 +191,7 @@ public class ChatBotService implements IChatBotService {
         if (result) {
             answer = ChatBotCommand.INFO.CLEAR_INFO_SUCCESS;
         }
-        SendResponse execute = bot.execute(new SendMessage(chatId, answer));
-        boolean ok = execute.isOk();
-        logUtils.log(LogUtils.LogLevel.INFO, "answerClear", chatId, "answerClear is send ok = " + ok);
+        replyMessage("answerClear", chatId, null, answer);
     }
 
     /**
@@ -205,35 +203,15 @@ public class ChatBotService implements IChatBotService {
      */
     private void answerByTextAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
         logUtils.log(LogUtils.LogLevel.INFO, "answerByTextAsync", chatId, "question = " + question + ",messageId = " + messageId);
-        sendState(chatId, ChatAction.typing);
+        TgApiUtils.sendState(bot, chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
             logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "question is null");
             bot.execute(new SendMessage(chatId, ChatBotCommand.INFO.QUESTION_IS_NULL));
             return;
         }
         chatService.doText(question, (answer, msg) -> {
-            SendMessage sendMessage;
-            if (answer != null) {
-                sendMessage = new SendMessage(chatId, answer);
-            } else {
-                sendMessage = new SendMessage(chatId, msg);
-            }
-            sendMessage.replyToMessageId(messageId);
-            bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
-                @Override
-                public void onResponse(SendMessage request, SendResponse response) {
-                    if (response.isOk()) {
-                        logUtils.log(LogUtils.LogLevel.INFO, "answerByTextAsync", chatId, "send message ok");
-                    } else {
-                        logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description());
-                    }
-                }
-
-                @Override
-                public void onFailure(SendMessage request, IOException e) {
-                    logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "send message error", e);
-                }
-            });
+            String answerMsg = answer != null ? answer : msg;
+            replyMessage("answerByTextAsync", chatId, messageId, answerMsg);
         });
     }
 
@@ -246,7 +224,7 @@ public class ChatBotService implements IChatBotService {
      */
     private void answerByChatTurboAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
         logUtils.log(LogUtils.LogLevel.INFO, "answerByChatTurboAsync", chatId, "question = " + question + ",messageId = " + messageId);
-        sendState(chatId, ChatAction.typing);
+        TgApiUtils.sendState(bot, chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
             logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "question is null");
             bot.execute(new SendMessage(chatId, ChatBotCommand.INFO.QUESTION_IS_NULL));
@@ -259,32 +237,16 @@ public class ChatBotService implements IChatBotService {
         chatCacheModel.addChat(chatId.toString(), Role.ROLE_USER, question);
         //endregion
         chatService.doChatByTurbo(chat, (chatVo, msg) -> {
-            SendMessage sendMessage;
+            String answerMsg;
             if (chatVo != null) {
                 //region 记录对话结果
-                String answer = parseAnswer(chatVo);
-                chatCacheModel.addChat(chatId.toString(), Role.ROLE_ASSISTANT, answer);
+                answerMsg = parseAnswer(chatVo);
+                chatCacheModel.addChat(chatId.toString(), Role.ROLE_ASSISTANT, answerMsg);
                 //endregion
-                sendMessage = new SendMessage(chatId, answer);
             } else {
-                sendMessage = new SendMessage(chatId, msg);
+                answerMsg = msg;
             }
-            sendMessage.replyToMessageId(messageId);
-            bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
-                @Override
-                public void onResponse(SendMessage request, SendResponse response) {
-                    if (response.isOk()) {
-                        logUtils.log(LogUtils.LogLevel.INFO, "answerByChatTurboAsync", chatId, "send message ok");
-                    } else {
-                        logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description());
-                    }
-                }
-
-                @Override
-                public void onFailure(SendMessage request, IOException e) {
-                    logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "send message error", e);
-                }
-            });
+            replyMessage("answerByChatTurboAsync", chatId, messageId, answerMsg);
         });
     }
 
@@ -309,18 +271,11 @@ public class ChatBotService implements IChatBotService {
         return sb.toString();
     }
 
-    /**
-     * 状态更新
-     *
-     * @param chatId     对话Id
-     * @param chatAction 状态
-     */
-    private void sendState(Long chatId, ChatAction chatAction) {
-        SendChatAction sendChatAction = new SendChatAction(chatId, chatAction);
-        bot.execute(sendChatAction);
-    }
-
     private boolean isValidUser(Long chatId) {
         return userInfoService.isValidUser(chatId);
+    }
+
+    private void replyMessage(String tag, Long chatId, Integer messageId, String message) {
+        TgApiUtils.replyMessage(tag, bot, logUtils, chatId, messageId, message);
     }
 }

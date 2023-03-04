@@ -3,18 +3,16 @@ package com.arno.tech.spring.base.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.logging.Logger;
 
 /**
  * Caffeine 配置
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/04
  */
 @Service

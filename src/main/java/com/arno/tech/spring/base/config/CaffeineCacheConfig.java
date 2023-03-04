@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 /**
  * Caffeine 配置
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/04
  */
 @Component

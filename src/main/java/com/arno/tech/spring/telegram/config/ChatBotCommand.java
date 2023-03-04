@@ -63,6 +63,11 @@ public interface ChatBotCommand {
         String QUESTION_IS_NULL = "请输入内容";
 
     }
+
+    interface AdminCommand {
+        String REGISTER = "/register";
+        String DELETE_USER = "/delete_user";
+    }
 }
 
 
