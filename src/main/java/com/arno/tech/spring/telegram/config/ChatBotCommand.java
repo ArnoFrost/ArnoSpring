@@ -37,9 +37,9 @@ public interface ChatBotCommand {
         String CHAT_TEXT_HELP_INFO = "输入 " + CHAT_TEXT + "你想说的话，例如：" + CHAT_TEXT + " 你好";
         String CHAT_GPT_HELP_INFO =
                 "输入" + CHAT_GPT + " + 你想说的话，例如：" + CHAT_GPT + " 你能做什么?\n" +
-                        "也可以使用简化命令 \\你想说的话, 例如：" + CHAT_GPT_SIMPLE + "你能做什么?\n" +
+                        "也可以使用简化命令 " + CHAT_GPT_SIMPLE + "你想说的话, 例如：" + CHAT_GPT_SIMPLE + "你能做什么?\n" +
                         "支持多轮对话~ 欢迎使用~\n" +
-                        "使用\" + CHAT_GPT_CLEAR + \" 清空聊天记录\n";
+                        "使用" + CHAT_GPT_CLEAR + " 清空聊天记录\n";
 
         String SLIPT_STRING = "         ------------------          ";
 //        String HELP_INFO = "目前支持的命令有: \n" +
