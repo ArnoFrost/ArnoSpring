@@ -2,6 +2,7 @@ package com.arno.tech.spring.user.model;
 
 import com.arno.tech.spring.user.model.bean.User;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -16,9 +17,14 @@ public interface IUserModel {
 
     boolean addUser(User user);
 
+    boolean addUser(List<User> userList);
+
     boolean deleteUser(long id);
 
     boolean changeUserStatus(long id, int status);
 
-    List<User> getUserList();
+    @NotNull List<User> getUserList();
+
+    boolean dropAll();
+
 }

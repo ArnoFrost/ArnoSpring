@@ -8,7 +8,7 @@ package com.arno.tech.spring.user.config;
  */
 public interface RedisKey {
     /**
-     * 用户信息 格式 arno:telegram:chat:user_info:{id}
+     * 用户信息 格式 arno:telegram:chat:user_info
      */
-    String USER_INFO = "arno:telegram:chat:user_info:";
+    String USER_INFO = "arno:telegram:chat:user_info";
 }

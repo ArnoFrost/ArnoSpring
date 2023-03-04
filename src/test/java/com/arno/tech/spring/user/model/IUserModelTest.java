@@ -3,6 +3,8 @@ package com.arno.tech.spring.user.model;
 import com.arno.tech.spring.telegram.config.TgConfig;
 import com.arno.tech.spring.user.model.bean.Role;
 import com.arno.tech.spring.user.model.bean.User;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +25,7 @@ class IUserModelTest {
 
     private final List<User> userList = new ArrayList<>();
 
-    @Test
+    @BeforeEach
     public void init() {
         buildUserList();
         printMap();
@@ -46,11 +48,41 @@ class IUserModelTest {
         });
     }
 
+    /**
+     * 注册用户
+     */
+    @Test
+    public void registerUser() {
+        buildUserList();
+        assert userModel.dropAll();
+        assert userModel.getUserList().size() == 0;
+        assert userList.size() > 0;
+
+        userModel.addUser(userList);
+        assert userModel.getUserList().size() == userList.size();
+    }
+
+//    @Test
+//    public void registerAdmin() {
+//        User user = new User();
+//        user.setId(0L);
+//        user.setName("admin");
+//        user.setStatus(1);
+//        user.setRole(Role.ADMIN);
+//        assert userModel.addUser(user);
+//    }
+
     @Test
     void getUserInfo() {
         Long id = 0L;
         User user = userModel.getUserInfo(id);
         assert user != null;
+    }
+
+    @Test
+    void printAllUser() {
+        List<User> userList = userModel.getUserList();
+        userList.forEach(System.out::println);
     }
 
     @Test
@@ -66,7 +98,7 @@ class IUserModelTest {
 
     @Test
     void changeUserStatus() {
-        userModel.changeUserStatus(666L, 0);
+        assert userModel.changeUserStatus(666L, 0);
         assert userModel.getUserInfo(666L).getStatus() == 0;
     }
 
@@ -76,9 +108,9 @@ class IUserModelTest {
         assert userList.size() > 0;
     }
 
-//    @Test
-void deleteUser() {
-    userModel.deleteUser(666L);
-    assert userModel.getUserInfo(666L) == null;
-}
+    @Test
+    void deleteUser() {
+        assert userModel.deleteUser(666L);
+        assert userModel.getUserInfo(666L) == null;
+    }
 }

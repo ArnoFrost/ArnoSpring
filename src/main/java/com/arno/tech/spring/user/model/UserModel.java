@@ -9,9 +9,11 @@ import com.arno.tech.spring.user.model.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 用户数据
@@ -31,9 +33,10 @@ public class UserModel implements IUserModel {
         this.logUtils = logUtils;
     }
 
+    //region 共有方法
     @Override
     public User getUserInfo(long id) {
-        List<User> userInfoFromCache = getUserInfoFromCache(id);
+        List<User> userInfoFromCache = getUserInfoFromCache();
         if (userInfoFromCache == null || userInfoFromCache.isEmpty()) {
             logUtils.log(LogUtils.LogLevel.WARN, "getUserInfo", -1L, "not find user", null);
             return null;
@@ -84,25 +87,86 @@ public class UserModel implements IUserModel {
     }
 
     @Override
+    public boolean addUser(List<User> userList) {
+        if (userList == null || userList.isEmpty()) {
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user list is null", null);
+            return false;
+        }
+        List<User> userListFromCache = getUserList();
+        if (userListFromCache == null || userListFromCache.isEmpty()) {
+            userListFromCache = new ArrayList<>();
+        }
+        List<User> finalUserListFromCache = userListFromCache;
+        List<User> collect = userList.stream()
+                .filter(u -> !finalUserListFromCache.stream().anyMatch(u1 -> Objects.equals(u1.getId(), u.getId())))
+                .collect(Collectors.toList());
+        if (collect.isEmpty()) {
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user list is exist", null);
+            return false;
+        }
+        userListFromCache.addAll(collect);
+        cacheService.setString(RedisKey.USER_INFO, JacksonUtils.beanToString(userListFromCache));
+        return true;
+    }
+
+    @Override
     public boolean deleteUser(long id) {
-        return false;
+        List<User> userList = getUserList();
+        if (userList == null || userList.isEmpty()) {
+            logUtils.log(LogUtils.LogLevel.WARN, "deleteUser", -1L, "user list is null", null);
+            return false;
+        }
+        boolean b = userList.removeIf(u -> u.getId() == id);
+        if (b) {
+            cacheService.setString(RedisKey.USER_INFO, JacksonUtils.beanToString(userList));
+        }
+        return true;
     }
 
     @Override
     public boolean changeUserStatus(long id, int status) {
-        return false;
+        List<User> userList = getUserList();
+        if (userList == null || userList.isEmpty()) {
+            logUtils.log(LogUtils.LogLevel.WARN, "changeUserStatus", -1L, "user list is null", null);
+            return false;
+        }
+        List<User> updatedUsers = userList.stream()
+                .map(u -> {
+                    u.setStatus(status);
+                    return u;
+                })
+                .collect(Collectors.toList());
+// 将更新后的列表保存回去
+        return save(updatedUsers);
     }
 
     @Override
-    public List<User> getUserList() {
-        return null;
+    public @NotNull List<User> getUserList() {
+        List<User> cache = getUserInfoFromCache();
+        if (cache == null) {
+            return new ArrayList<>();
+        }
+        return cache;
     }
 
-    private List<User> getUserInfoFromCache(long id) {
-        String string = cacheService.getString(RedisKey.USER_INFO + id);
+    @Override
+    public boolean dropAll() {
+        return cacheService.delete(RedisKey.USER_INFO);
+    }
+    //endregion
+
+    //region 私有方法
+    private List<User> getUserInfoFromCache() {
+        String string = cacheService.getString(RedisKey.USER_INFO);
         if (string == null || string.isEmpty()) {
             return null;
         }
         return JacksonUtils.stringToList(string, User.class);
     }
+
+    private boolean save(List<User> updatedUsers) {
+        cacheService.setString(RedisKey.USER_INFO, JacksonUtils.beanToString(updatedUsers));
+        return true;
+    }
+    //endregion
 }
