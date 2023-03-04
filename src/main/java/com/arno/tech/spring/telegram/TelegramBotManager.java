@@ -1,11 +1,10 @@
 package com.arno.tech.spring.telegram;
 
-import com.arno.tech.spring.telegram.config.TgConfig;
+import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.telegram.service.ChatAdminBotService;
 import com.arno.tech.spring.telegram.service.ChatBotService;
 import com.arno.tech.spring.telegram.service.IChatAdminBotService;
 import com.arno.tech.spring.telegram.service.IChatBotService;
-import com.arno.tech.spring.base.utils.LogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TelegramBotManager {
-    private final TgConfig config;
     private final LogUtils logUtils;
 
     private final IChatBotService chatBotService;
@@ -25,8 +23,7 @@ public class TelegramBotManager {
     private final IChatAdminBotService adminBotService;
 
     @Autowired
-    public TelegramBotManager(TgConfig config, ChatBotService chatBotService, ChatAdminBotService adminBotService) {
-        this.config = config;
+    public TelegramBotManager(ChatBotService chatBotService, ChatAdminBotService adminBotService) {
         this.chatBotService = chatBotService;
         this.adminBotService = adminBotService;
         this.logUtils = LogUtils.getInstance();
@@ -36,6 +33,7 @@ public class TelegramBotManager {
      * 初始化配置
      */
     public void init() {
+        logUtils.log(LogUtils.LogLevel.INFO, "TelegramBotManager", 0L, "init");
         chatBotService.init();
         adminBotService.init();
     }

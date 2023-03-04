@@ -1,7 +1,6 @@
 package com.arno.tech.spring.base.utils;
 
 import com.arno.tech.spring.telegram.config.TgConfig;
-import com.arno.tech.spring.user.service.IUserInfoService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -13,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogUtils {
     private TgConfig config;
-
-    private IUserInfoService userInfoService;
 
     private LogUtils() {
 
@@ -32,12 +29,12 @@ public class LogUtils {
         this.config = config;
     }
 
-    public void setUserInfoService(IUserInfoService userInfoService) {
-        this.userInfoService = userInfoService;
-    }
-
     public void setConfig(TgConfig config) {
         this.config = config;
+    }
+
+    public void log(int logLevel, String tag, Long chatId, String str) {
+        log(logLevel, tag, chatId, str, null);
     }
 
     public void log(int logLevel, String tag, Long chatId, String str, Exception e) {
@@ -65,10 +62,8 @@ public class LogUtils {
     }
 
     private String getUserNameByChatId(Long chatId) {
-        if (userInfoService == null) {
-            return "";
-        }
-        return userInfoService.getUserNameByChatId(chatId);
+        //TODO:ArnoFrost 2023/3/4
+        return "";
     }
 
     /**

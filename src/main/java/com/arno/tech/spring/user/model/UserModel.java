@@ -6,6 +6,7 @@ import com.arno.tech.spring.base.utils.JacksonUtils;
 import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.user.config.RedisKey;
 import com.arno.tech.spring.user.model.bean.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -38,7 +39,7 @@ public class UserModel implements IUserModel {
     public User getUserInfo(long id) {
         List<User> userInfoFromCache = getUserInfoFromCache();
         if (userInfoFromCache == null || userInfoFromCache.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "getUserInfo", -1L, "not find user", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "getUserInfo", -1L, "not find user");
             return null;
         }
         User user = userInfoFromCache.stream()
@@ -46,7 +47,7 @@ public class UserModel implements IUserModel {
                 .findFirst()
                 .orElse(null);
 
-        logUtils.log(LogUtils.LogLevel.INFO, "getUserInfo", -1L, "user:" + user, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "getUserInfo", -1L, "user:" + user);
         return user;
     }
 
@@ -54,19 +55,19 @@ public class UserModel implements IUserModel {
     public boolean addUser(User user) {
         //region 健壮性维护
         if (user == null) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user is null", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user is null");
             return false;
         }
         if (user.getId() == 0) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user id is 0 user = " + user, null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user id is 0 user = " + user);
             return false;
         }
         if (user.getName() == null || user.getName().isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user name is null user = " + user, null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user name is null user = " + user);
             return false;
         }
         if (user.getRole() <= 0) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user role is illegal user = " + user, null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user role is illegal user = " + user);
             return false;
         }
         //endregion
@@ -78,7 +79,7 @@ public class UserModel implements IUserModel {
         }
 
         if (userList.stream().anyMatch(u -> Objects.equals(u.getId(), user.getId()))) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user is exist", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user is exist");
             return false;
         }
         userList.add(user);
@@ -89,7 +90,7 @@ public class UserModel implements IUserModel {
     @Override
     public boolean addUser(List<User> userList) {
         if (userList == null || userList.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user list is null", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user list is null");
             return false;
         }
         List<User> userListFromCache = getUserList();
@@ -101,7 +102,7 @@ public class UserModel implements IUserModel {
                 .filter(u -> !finalUserListFromCache.stream().anyMatch(u1 -> Objects.equals(u1.getId(), u.getId())))
                 .collect(Collectors.toList());
         if (collect.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user list is exist", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "addUser", -1L, "user list is exist");
             return false;
         }
         userListFromCache.addAll(collect);
@@ -113,7 +114,7 @@ public class UserModel implements IUserModel {
     public boolean deleteUser(long id) {
         List<User> userList = getUserList();
         if (userList == null || userList.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "deleteUser", -1L, "user list is null", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "deleteUser", -1L, "user list is null");
             return false;
         }
         boolean b = userList.removeIf(u -> u.getId() == id);
@@ -127,7 +128,7 @@ public class UserModel implements IUserModel {
     public boolean changeUserStatus(long id, int status) {
         List<User> userList = getUserList();
         if (userList == null || userList.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "changeUserStatus", -1L, "user list is null", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "changeUserStatus", -1L, "user list is null");
             return false;
         }
         List<User> updatedUsers = userList.stream()
@@ -160,16 +161,16 @@ public class UserModel implements IUserModel {
     private List<User> getUserInfoFromCache() {
         String localCache = cacheService.getLocalStr(RedisKey.USER_INFO);
         if (localCache != null && !localCache.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.INFO, "getUserInfoFromCache", -1L, "hint local cache", null);
+            logUtils.log(LogUtils.LogLevel.INFO, "getUserInfoFromCache", -1L, "hint local cache");
             return JacksonUtils.stringToList(localCache, User.class);
         }
         String string = cacheService.getString(RedisKey.USER_INFO);
         if (string == null || string.isEmpty()) {
-            logUtils.log(LogUtils.LogLevel.WARN, "getUserInfoFromCache", -1L, "not find user", null);
+            logUtils.log(LogUtils.LogLevel.WARN, "getUserInfoFromCache", -1L, "not find user");
             cacheService.setLocalStr(RedisKey.USER_INFO, "[]");
             return null;
         }
-        logUtils.log(LogUtils.LogLevel.INFO, "getUserInfoFromCache", -1L, "hint redis cache", null);
+        logUtils.log(LogUtils.LogLevel.INFO, "getUserInfoFromCache", -1L, "hint redis cache");
         cacheService.setLocalStr(RedisKey.USER_INFO, string);
         return JacksonUtils.stringToList(string, User.class);
     }

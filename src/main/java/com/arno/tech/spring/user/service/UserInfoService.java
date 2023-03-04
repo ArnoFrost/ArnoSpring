@@ -63,6 +63,9 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public String getUserNameByChatId(Long chatId) {
         List<User> userList = userModel.getUserList();
+        if (userList.isEmpty()) {
+            return null;
+        }
         for (User user : userList) {
             if (user.getId().equals(chatId)) {
                 return user.getName();

@@ -58,7 +58,7 @@ public class ChatBotService implements IChatBotService {
         if (config.isDebug()) {
             bot = new TelegramBot.Builder(config.getToken()).debug().build();
             //调试用
-            logUtils.log(LogUtils.LogLevel.DEBUG, "ChatBotService", null, "Telegram chat bot init name = " + config.getName() + ", token = " + config.getToken(), null);
+            logUtils.log(LogUtils.LogLevel.DEBUG, "ChatBotService", null, "Telegram chat bot init name = " + config.getName() + ", token = " + config.getToken());
         } else {
             bot = new TelegramBot(config.getToken());
         }
@@ -77,21 +77,21 @@ public class ChatBotService implements IChatBotService {
      */
     private void dispatchUpdate(Update update) {
         if (update == null) {
-            logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", null, "update is null", null);
+            logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", null, "update is null");
             return;
         }
         if (update.message() == null) {
-            logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", null, "update message is null", null);
+            logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", null, "update message is null");
             return;
         }
         if (update.message().text() == null) {
-            logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", null, "update message text is null", null);
+            logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", null, "update message text is null");
             return;
         }
         Long chatId = update.message().chat().id();
         Integer messageId = update.message().messageId();
         String text = update.message().text();
-        logUtils.log(LogUtils.LogLevel.INFO, "dispatchUpdate", chatId, "text = " + text, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "dispatchUpdate", chatId, "text = " + text);
         String content;
         if (text.startsWith(ChatBotCommand.START)) {
             answerHelp(bot, ChatBotCommand.START, chatId);
@@ -103,7 +103,7 @@ public class ChatBotService implements IChatBotService {
             //中断操作
             if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
-                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_TEXT.length());
@@ -114,7 +114,7 @@ public class ChatBotService implements IChatBotService {
             //中断操作
             if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
-                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
             answerClear(bot, chatId);
@@ -122,7 +122,7 @@ public class ChatBotService implements IChatBotService {
             //中断操作
             if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
-                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_GPT.length());
@@ -133,7 +133,7 @@ public class ChatBotService implements IChatBotService {
             //中断操作
             if (isValidUser(chatId)) {
                 answerHelp(bot, ChatBotCommand.REGISTER, chatId);
-                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_GPT_SIMPLE.length());
@@ -150,7 +150,7 @@ public class ChatBotService implements IChatBotService {
      * @param chatId   对话Id
      */
     private void answerHelp(TelegramBot bot, String helpType, Long chatId) {
-        logUtils.log(LogUtils.LogLevel.INFO, "answerHelp", chatId, "helpType = " + helpType, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "answerHelp", chatId, "helpType = " + helpType);
         String answer = "";
         switch (helpType) {
             case ChatBotCommand.START:
@@ -166,7 +166,7 @@ public class ChatBotService implements IChatBotService {
                 answer = ChatBotCommand.INFO.CHAT_TEXT_HELP_INFO;
                 break;
             case ChatBotCommand.REGISTER:
-                logUtils.log(LogUtils.LogLevel.WARN, "answerHelp", chatId, "chatId = " + chatId + " 未注册", null);
+                logUtils.log(LogUtils.LogLevel.WARN, "answerHelp", chatId, "chatId = " + chatId + " 未注册");
                 answer = ChatBotCommand.INFO.REGISTER_INFO + chatId;
                 break;
             default:
@@ -175,7 +175,7 @@ public class ChatBotService implements IChatBotService {
         }
         SendResponse execute = bot.execute(new SendMessage(chatId, answer));
         boolean ok = execute.isOk();
-        logUtils.log(LogUtils.LogLevel.INFO, "answerHelp", chatId, "answerHelp is send ok = " + ok, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "answerHelp", chatId, "answerHelp is send ok = " + ok);
     }
 
     /**
@@ -185,7 +185,7 @@ public class ChatBotService implements IChatBotService {
      * @param chatId 聊天id
      */
     private void answerClear(TelegramBot bot, Long chatId) {
-        logUtils.log(LogUtils.LogLevel.INFO, "answerClear", chatId, "clear", null);
+        logUtils.log(LogUtils.LogLevel.INFO, "answerClear", chatId, "clear");
         boolean result = chatCacheModel.deleteChat(chatId.toString());
         String answer = ChatBotCommand.INFO.CLEAR_INFO_ERROR;
         if (result) {
@@ -193,7 +193,7 @@ public class ChatBotService implements IChatBotService {
         }
         SendResponse execute = bot.execute(new SendMessage(chatId, answer));
         boolean ok = execute.isOk();
-        logUtils.log(LogUtils.LogLevel.INFO, "answerClear", chatId, "answerClear is send ok = " + ok, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "answerClear", chatId, "answerClear is send ok = " + ok);
     }
 
     /**
@@ -204,10 +204,10 @@ public class ChatBotService implements IChatBotService {
      * @param chatId   对话Id
      */
     private void answerByTextAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
-        logUtils.log(LogUtils.LogLevel.INFO, "answerByTextAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "answerByTextAsync", chatId, "question = " + question + ",messageId = " + messageId);
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
-            logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "question is null", null);
+            logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "question is null");
             bot.execute(new SendMessage(chatId, ChatBotCommand.INFO.QUESTION_IS_NULL));
             return;
         }
@@ -223,9 +223,9 @@ public class ChatBotService implements IChatBotService {
                 @Override
                 public void onResponse(SendMessage request, SendResponse response) {
                     if (response.isOk()) {
-                        logUtils.log(LogUtils.LogLevel.INFO, "answerByTextAsync", chatId, "send message ok", null);
+                        logUtils.log(LogUtils.LogLevel.INFO, "answerByTextAsync", chatId, "send message ok");
                     } else {
-                        logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description(), null);
+                        logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description());
                     }
                 }
 
@@ -245,10 +245,10 @@ public class ChatBotService implements IChatBotService {
      * @param chatId   对话Id
      */
     private void answerByChatTurboAsync(TelegramBot bot, String question, Long chatId, Integer messageId) {
-        logUtils.log(LogUtils.LogLevel.INFO, "answerByChatTurboAsync", chatId, "question = " + question + ",messageId = " + messageId, null);
+        logUtils.log(LogUtils.LogLevel.INFO, "answerByChatTurboAsync", chatId, "question = " + question + ",messageId = " + messageId);
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
-            logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "question is null", null);
+            logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "question is null");
             bot.execute(new SendMessage(chatId, ChatBotCommand.INFO.QUESTION_IS_NULL));
             return;
         }
@@ -274,9 +274,9 @@ public class ChatBotService implements IChatBotService {
                 @Override
                 public void onResponse(SendMessage request, SendResponse response) {
                     if (response.isOk()) {
-                        logUtils.log(LogUtils.LogLevel.INFO, "answerByChatTurboAsync", chatId, "send message ok", null);
+                        logUtils.log(LogUtils.LogLevel.INFO, "answerByChatTurboAsync", chatId, "send message ok");
                     } else {
-                        logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description(), null);
+                        logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "send message error, code = " + response.errorCode() + ", description = " + response.description());
                     }
                 }
 

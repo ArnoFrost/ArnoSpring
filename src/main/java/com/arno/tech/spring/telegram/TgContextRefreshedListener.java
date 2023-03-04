@@ -40,8 +40,7 @@ public class TgContextRefreshedListener implements ApplicationListener<ContextRe
      */
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        telegramBotManager.init();
         LogUtils.getInstance().setConfig(config);
-        LogUtils.getInstance().setUserInfoService(userInfoService);
+        telegramBotManager.init();
     }
 }
