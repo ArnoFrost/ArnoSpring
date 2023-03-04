@@ -26,11 +26,18 @@ public class CacheService implements ICacheService {
 
     @Override
     public String getString(String key) {
-        return redissonClient.getBucket(key).get().toString();
+        Object result = redissonClient.getBucket(key).get();
+        if (result == null) {
+            return null;
+        } else {
+            return result.toString();
+        }
     }
 
     @Override
     public boolean delete(String key) {
-        return redissonClient.getBucket(key).delete();
+//        return redissonClient.getBucket(key).delete();
+        setString(key, "");
+        return true;
     }
 }

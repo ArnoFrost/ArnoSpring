@@ -1,6 +1,7 @@
 package com.arno.tech.spring.user.model.bean;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 用户角色
@@ -9,6 +10,7 @@ import lombok.Data;
  * @since 2023/03/04
  */
 @Data
+@ToString
 public class User {
     /**
      * 用户id
