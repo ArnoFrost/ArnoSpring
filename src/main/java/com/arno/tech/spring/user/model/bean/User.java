@@ -1,7 +1,6 @@
 package com.arno.tech.spring.user.model.bean;
 
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * 用户角色
@@ -10,16 +9,15 @@ import lombok.ToString;
  * @since 2023/03/04
  */
 @Data
-@ToString
 public class User {
-    /**
-     * 用户id
-     */
-    private Long id;
     /**
      * 用户名
      */
     private String name;
+    /**
+     * 用户id
+     */
+    private Long id;
     /**
      * 状态
      */
@@ -31,4 +29,13 @@ public class User {
     private int role;
 
 
+    @Override
+    public String toString() {
+        return "{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                ", role=" + role +
+                '}';
+    }
 }

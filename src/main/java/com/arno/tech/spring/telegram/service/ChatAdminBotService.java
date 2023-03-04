@@ -2,6 +2,7 @@ package com.arno.tech.spring.telegram.service;
 
 import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.telegram.config.ChatBotCommand;
+import com.arno.tech.spring.telegram.config.HelpInfo;
 import com.arno.tech.spring.telegram.config.TgConfig;
 import com.arno.tech.spring.telegram.utils.TgApiUtils;
 import com.arno.tech.spring.user.model.bean.Role;
@@ -12,6 +13,8 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 聊天管理实现
@@ -26,13 +29,16 @@ public class ChatAdminBotService implements IChatAdminBotService {
     private TelegramBot bot;
 
     private final IUserInfoService userInfoService;
+
+    private final HelpInfo helpInfo;
     private final LogUtils logUtils;
 
 
     @Autowired
-    public ChatAdminBotService(TgConfig config, IUserInfoService userInfoService) {
+    public ChatAdminBotService(TgConfig config, IUserInfoService userInfoService, HelpInfo helpInfo) {
         this.config = config;
         this.userInfoService = userInfoService;
+        this.helpInfo = helpInfo;
         logUtils = LogUtils.getInstance();
     }
 
@@ -91,18 +97,45 @@ public class ChatAdminBotService implements IChatAdminBotService {
             String[] splitCommand = text.split("\\s+"); // 使用空格分割字符串
             String userId = splitCommand[1];
             doDeleteUser(chatId, messageId, userId);
+        } else if (text.startsWith(ChatBotCommand.AdminCommand.HELP)) {
+            replyMessage("dispatchUpdate", chatId, messageId, helpInfo.getAdminHelpString());
+        } else if (text.startsWith(ChatBotCommand.AdminCommand.GET_USER_LIST)) {
+            getUserList(chatId, messageId);
+        } else {
+            replyMessage("dispatchUpdate", chatId, messageId, "未知指令~");
         }
+
+    }
+
+    private void getUserList(Long chatId, Integer messageId) {
+        List<User> userList = userInfoService.getUserList();
+        if (userList == null || userList.isEmpty()) {
+            replyMessage("getUserList", chatId, messageId, "用户列表为空~");
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (User user : userList) {
+            sb.append(user.toString()).append("\n");
+        }
+
+        replyMessage("getUserList", chatId, messageId, sb.toString());
     }
 
 
     private void doRegister(Long chatId, Integer messageId, String uid, String userName) {
-        User user = null;
+        User user;
         try {
             user = new User();
             user.setId(Long.parseLong(uid));
             user.setName(userName);
             user.setRole(Role.USER);
-            userInfoService.registerUser(user);
+            user.setStatus(1);
+            boolean isAddSuccess = userInfoService.registerUser(user);
+            if (isAddSuccess) {
+                replyMessage("doRegister", chatId, messageId, "注册成功~");
+            } else {
+                replyMessage("doRegister", chatId, messageId, "注册失败");
+            }
         } catch (NumberFormatException e) {
             replyMessage("doRegister", chatId, messageId, "注册失败，用户ID格式错误~");
         }

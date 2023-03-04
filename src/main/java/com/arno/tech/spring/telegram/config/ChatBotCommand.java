@@ -65,8 +65,25 @@ public interface ChatBotCommand {
     }
 
     interface AdminCommand {
+        /**
+         * ```telegram command
+         * register - 注册
+         * delete_user - 删除用户
+         * ban_user - 禁用账户
+         * unban_user - 解封账户
+         * get_user_list - 获取用户列表
+         * fetch_log - 获取日志
+         * help - 获得帮助
+         * ```
+         */
         String REGISTER = "/register";
         String DELETE_USER = "/delete_user";
+        String BAN_USER = "/ban_user";
+        String UNBAN_USER = "/unban_user";
+
+        String GET_USER_LIST = "/get_user_list";
+        String FETCH_LOG = "/fetch_log";
+        String HELP = "/help";
     }
 }
 
