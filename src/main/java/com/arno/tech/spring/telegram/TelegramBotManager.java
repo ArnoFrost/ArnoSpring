@@ -5,7 +5,7 @@ import com.arno.tech.spring.telegram.service.ChatAdminBotService;
 import com.arno.tech.spring.telegram.service.ChatBotService;
 import com.arno.tech.spring.telegram.service.IChatAdminBotService;
 import com.arno.tech.spring.telegram.service.IChatBotService;
-import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.base.utils.LogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

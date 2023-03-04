@@ -13,4 +13,15 @@ public interface ICacheService {
     String getString(String key);
 
     boolean delete(String key);
+
+
+    <T> boolean setLocal(String key, T value);
+
+    <T> T getLocal(String key, Class<T> value);
+
+    boolean setLocalStr(String key, String value);
+
+    String getLocalStr(String key);
+
+    void deleteLocal(String key);
 }

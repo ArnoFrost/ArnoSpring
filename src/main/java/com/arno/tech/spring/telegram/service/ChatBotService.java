@@ -9,7 +9,7 @@ import com.arno.tech.spring.telegram.config.TgConfig;
 import com.arno.tech.spring.telegram.model.IChatCacheModel;
 import com.arno.tech.spring.telegram.model.bean.Chat;
 import com.arno.tech.spring.telegram.model.bean.Role;
-import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.user.service.IUserInfoService;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;

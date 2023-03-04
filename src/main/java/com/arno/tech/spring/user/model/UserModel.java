@@ -3,7 +3,7 @@ package com.arno.tech.spring.user.model;
 import com.arno.tech.spring.base.service.CacheService;
 import com.arno.tech.spring.base.service.ICacheService;
 import com.arno.tech.spring.base.utils.JacksonUtils;
-import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.user.config.RedisKey;
 import com.arno.tech.spring.user.model.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,16 +156,28 @@ public class UserModel implements IUserModel {
     //endregion
 
     //region 私有方法
+    //增加本地缓存逻辑
     private List<User> getUserInfoFromCache() {
+        String localCache = cacheService.getLocalStr(RedisKey.USER_INFO);
+        if (localCache != null && !localCache.isEmpty()) {
+            logUtils.log(LogUtils.LogLevel.INFO, "getUserInfoFromCache", -1L, "hint local cache", null);
+            return JacksonUtils.stringToList(localCache, User.class);
+        }
         String string = cacheService.getString(RedisKey.USER_INFO);
         if (string == null || string.isEmpty()) {
+            logUtils.log(LogUtils.LogLevel.WARN, "getUserInfoFromCache", -1L, "not find user", null);
+            cacheService.setLocalStr(RedisKey.USER_INFO, "[]");
             return null;
         }
+        logUtils.log(LogUtils.LogLevel.INFO, "getUserInfoFromCache", -1L, "hint redis cache", null);
+        cacheService.setLocalStr(RedisKey.USER_INFO, string);
         return JacksonUtils.stringToList(string, User.class);
     }
 
     private boolean save(List<User> updatedUsers) {
-        cacheService.setString(RedisKey.USER_INFO, JacksonUtils.beanToString(updatedUsers));
+        String string = JacksonUtils.beanToString(updatedUsers);
+        cacheService.setString(RedisKey.USER_INFO, string);
+        cacheService.setLocalStr(RedisKey.USER_INFO, string);
         return true;
     }
     //endregion

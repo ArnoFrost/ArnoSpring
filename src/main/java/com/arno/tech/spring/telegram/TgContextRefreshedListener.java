@@ -1,7 +1,7 @@
 package com.arno.tech.spring.telegram;
 
 import com.arno.tech.spring.telegram.config.TgConfig;
-import com.arno.tech.spring.telegram.utils.LogUtils;
+import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.user.service.IUserInfoService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
