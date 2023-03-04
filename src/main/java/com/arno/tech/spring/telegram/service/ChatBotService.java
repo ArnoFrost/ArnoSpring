@@ -11,6 +11,7 @@ import com.arno.tech.spring.telegram.model.bean.Chat;
 import com.arno.tech.spring.telegram.model.bean.Role;
 import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.telegram.utils.TgApiUtils;
+import com.arno.tech.spring.user.model.bean.User;
 import com.arno.tech.spring.user.service.IUserInfoService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -79,7 +80,24 @@ public class ChatBotService implements IChatBotService {
 
     @Override
     public boolean pushAll(String testMsg) {
-        return false;
+        if (StringUtils.isEmpty(testMsg)) {
+            return false;
+        }
+        List<User> userList = userInfoService.getUserList();
+        if (userList == null || userList.isEmpty()) {
+            return false;
+        }
+        for (User user : userList) {
+            if (user == null) {
+                continue;
+            }
+            Long chatId = user.getId();
+            if (chatId == null) {
+                continue;
+            }
+            pushSingle(chatId, testMsg);
+        }
+        return true;
     }
 
     /**

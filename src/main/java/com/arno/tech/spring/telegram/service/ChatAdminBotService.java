@@ -15,6 +15,8 @@ import com.pengrad.telegrambot.model.request.ChatAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -115,6 +117,13 @@ public class ChatAdminBotService implements IChatAdminBotService {
         } else if (text.startsWith(ChatBotCommand.AdminCommand.PUSH_ALL)) {
             String pushMsg = text.substring(ChatBotCommand.AdminCommand.PUSH_ALL.length());
             pushAll(chatId, messageId, pushMsg);
+        } else if (text.startsWith(ChatBotCommand.AdminCommand.FETCH_LOG)) {
+            try {
+                uploadLog(chatId);
+            } catch (Exception e) {
+                logUtils.log(LogUtils.LogLevel.ERROR, "dispatchUpdate", chatId, "upload log error", e);
+                replyMessage("dispatchUpdate", chatId, messageId, "上传日志失败~");
+            }
         } else {
             replyMessage("dispatchUpdate", chatId, messageId, "未知指令~");
         }
@@ -142,6 +151,7 @@ public class ChatAdminBotService implements IChatAdminBotService {
             replyMessage("pushAll", chatId, messageId, "推送内容不能为空~");
             return;
         }
+        //目前是阻塞形态，后续改成异步
         boolean success = chatBotService.pushAll(pushMsg);
         if (success) {
             replyMessage("pushAll", chatId, messageId, "推送成功~");
@@ -198,6 +208,28 @@ public class ChatAdminBotService implements IChatAdminBotService {
         }
     }
 
+    private void uploadLog(Long chatId) {
+        String rootPath = "/Users/xuxin14/ServerGeek/ChatgptBot";
+        File localDir = new File(rootPath + "/logs/local");
+        File[] files = localDir.listFiles();
+        List<File> fileList = Arrays.asList(files);
+        List<File> collect = fileList.stream()
+                .sorted(Comparator.comparingLong(File::lastModified).reversed())
+                .limit(1)
+                .collect(Collectors.toList());
+
+        if (collect != null) {
+            File file = collect.get(0);
+            String fileName = file.getName();
+            String filePath = file.getPath();
+            logUtils.log(LogUtils.LogLevel.INFO, "uploadLog", chatId, "fileName = " + fileName);
+            logUtils.log(LogUtils.LogLevel.INFO, "uploadLog", chatId, "filePath = " + filePath);
+            TgApiUtils.sendState(bot, chatId, ChatAction.upload_document);
+            TgApiUtils.sendDocument("uploadLog", bot, logUtils, chatId, filePath, fileName);
+        }
+
+
+    }
 
     private void replyMessage(String tag, Long chatId, Integer messageId, String message) {
         TgApiUtils.replyMessage(tag, bot, logUtils, chatId, messageId, message);
