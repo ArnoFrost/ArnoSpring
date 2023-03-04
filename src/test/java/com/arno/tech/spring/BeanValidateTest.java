@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * Person
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/02
  */
 @Data
@@ -52,7 +52,7 @@ class Person {
 /**
  * 数据类校验测试
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/02
  */
 @RunWith(SpringRunner.class)

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 聊天服务
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/07
  */
 public interface ChatService {

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * OpenAI 请求管理
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/07
  */
 @Service
@@ -55,11 +55,9 @@ public class OpenAIServiceImpl implements IOpenAI {
 
     @Override
     public void doChatByTurbo(String openAiKey, String question, @NotNull OpenAiResult<ChatModelResponse> consumer) {
-
         model.doChatByTurbo(openAiKey, question, chatModelResponse -> {
-            //TODO:xuxin14 2023/3/2 调整逻辑拦截
+            //TODO:ArnoFrost 2023/3/2 调整逻辑拦截
 //                log.info("doChatByTurbo:aiAnswer{}", aiAnswer);
-            StringBuilder answers = new StringBuilder();
             if (chatModelResponse == null) {
                 consumer.onResult(null, "请求失败");
                 return;
@@ -77,7 +75,7 @@ public class OpenAIServiceImpl implements IOpenAI {
     @Override
     public void doChatByTurbo(String openAiKey, List<Chat> chats, OpenAiResult<ChatModelResponse> consumer) {
         model.doChatByTurbo(openAiKey, chats, chatModelResponse -> {
-            //TODO:xuxin14 2023/3/2 调整逻辑拦截
+            //TODO:ArnoFrost 2023/3/2 调整逻辑拦截
 //                log.info("doChatByTurbo:aiAnswer{}", aiAnswer);
             StringBuilder answers = new StringBuilder();
             if (chatModelResponse == null) {

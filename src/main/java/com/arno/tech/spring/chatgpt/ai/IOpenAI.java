@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * OpenAI 接口
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/07
  */
 public interface IOpenAI {

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * 日志工具
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/07
  */
 @Slf4j
@@ -48,7 +48,7 @@ public class LogUtils {
     /**
      * 日志级别
      *
-     * @author xuxin14
+     * @author ArnoFrost
      * @since 2023/02/07
      */
     public interface LogLevel {

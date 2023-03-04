@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 /**
  * AI数据管理层
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 @Repository
@@ -43,7 +43,7 @@ public class AIModel implements IAIModel {
     @Override
     public void doText3(String openAiKey, String question, Consumer<AIAnswer> aiAnswerConsumer) {
         JsonObject requestJson = new JsonObject();
-        requestJson.addProperty("model", "text-davinci-003");
+        requestJson.addProperty("model", GptMode.DAVINCI_3.getValue());
         requestJson.addProperty("prompt", question);
         requestJson.addProperty("temperature", 0);
         requestJson.addProperty("max_tokens", 1024);

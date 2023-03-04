@@ -6,7 +6,7 @@ import ws.vinta.pangu.Pangu;
 /**
  * 美化中文
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/28
  */
 

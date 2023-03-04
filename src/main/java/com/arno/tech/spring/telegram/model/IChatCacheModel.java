@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 对话缓存服务
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 public interface IChatCacheModel {

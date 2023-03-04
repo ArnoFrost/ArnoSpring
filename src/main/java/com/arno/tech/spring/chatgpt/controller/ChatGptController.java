@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * chatgpt 服务
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/02
  */
 @RestController

@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Telegram 配置处理
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/07
  */
 @Data

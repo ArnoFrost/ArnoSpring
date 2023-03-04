@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * 网络请求工具类
  * 初步封装采用需要实例化的方式
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2022/12/13
  */
 @Slf4j

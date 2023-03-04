@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 /**
  * AI Model
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 public interface IAIModel {

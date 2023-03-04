@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Springboot内置bean序列化解析器配置
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 @Configuration
@@ -125,7 +125,7 @@ public class JacksonConfig {
      * private T data;
      * </pre>
      *
-     * @author xuxin14
+     * @author ArnoFrost
      * @date 2022/12/26
      */
     public static class NullToEmptySerializer extends JsonSerializer<Object> {

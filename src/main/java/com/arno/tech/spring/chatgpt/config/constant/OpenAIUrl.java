@@ -1,7 +1,7 @@
 package com.arno.tech.spring.chatgpt.config.constant;
 
 /**
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 public interface OpenAIUrl {

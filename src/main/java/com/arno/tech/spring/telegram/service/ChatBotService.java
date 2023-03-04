@@ -4,6 +4,7 @@ import com.arno.tech.spring.chatgpt.ai.model.chat.ChatModelResponse;
 import com.arno.tech.spring.chatgpt.ai.vo.ChatVo;
 import com.arno.tech.spring.chatgpt.service.ChatService;
 import com.arno.tech.spring.telegram.config.ChatBotCommand;
+import com.arno.tech.spring.telegram.config.HelpInfo;
 import com.arno.tech.spring.telegram.config.TgConfig;
 import com.arno.tech.spring.telegram.model.IChatCacheModel;
 import com.arno.tech.spring.telegram.model.bean.Chat;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * 聊天服务实现
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/04
  */
 @Service
@@ -36,15 +37,17 @@ public class ChatBotService implements IChatBotService {
     private final IChatCacheModel chatCacheModel;
     private final ChatService chatService;
     private final LogUtils logUtils;
+    private final HelpInfo helpInfo;
     private TelegramBot bot;
 
 
     @Autowired
-    public ChatBotService(TgConfig config, IChatCacheModel chatCacheModel, ChatService chatService, LogUtils logUtils) {
+    public ChatBotService(TgConfig config, IChatCacheModel chatCacheModel, ChatService chatService, LogUtils logUtils, HelpInfo helpInfo) {
         this.config = config;
         this.chatCacheModel = chatCacheModel;
         this.chatService = chatService;
         this.logUtils = logUtils;
+        this.helpInfo = helpInfo;
     }
 
     @Override
@@ -121,6 +124,17 @@ public class ChatBotService implements IChatBotService {
             }
             content = text.substring(ChatBotCommand.CHAT_GPT.length());
             answerByChatTurboAsync(bot, content, chatId, messageId);
+        } else if (text.startsWith(ChatBotCommand.CHAT_GPT_SIMPLE)) {
+            // 兜底改进用gpt 命令处理
+
+            //中断操作
+            if (!config.isInWhiteList(chatId)) {
+                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+                logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list", null);
+                return;
+            }
+            content = text.substring(ChatBotCommand.CHAT_GPT_SIMPLE.length());
+            answerByChatTurboAsync(bot, content, chatId, messageId);
         }
 
     }
@@ -137,19 +151,10 @@ public class ChatBotService implements IChatBotService {
         String answer = "";
         switch (helpType) {
             case ChatBotCommand.START:
-                answer = "欢迎使用Arno的Robot, 你可以输入 /help 查看帮助";
+                answer = ChatBotCommand.INFO.START_INFO;
                 break;
             case ChatBotCommand.HELP:
-                /**
-                 * chatgpt - 机器人聊天
-                 * chatgpt_help - 机器人聊天帮助
-                 * help - 帮助
-                 */
-                answer = "目前支持的命令有: \n" +
-                        "/start 开始\n" +
-                        "/help 帮助\n" +
-                        "/chatgpt 机器人聊天\n" +
-                        "/chatgpt_help 机器人聊天帮助\n";
+                answer = helpInfo.getHelpString();
                 break;
             case ChatBotCommand.CHAT_GPT_HELP:
                 answer = ChatBotCommand.INFO.CHAT_GPT_HELP_INFO;
@@ -159,10 +164,10 @@ public class ChatBotService implements IChatBotService {
                 break;
             case ChatBotCommand.REGISTER:
                 logUtils.log(LogUtils.LogLevel.WARN, "answerHelp", chatId, "chatId = " + chatId + " 未注册", null);
-                answer = "白名单机制开启,请向管理员Arno 反馈本次会话 id : \n" + chatId;
+                answer = ChatBotCommand.INFO.REGISTER_INFO + chatId;
                 break;
             default:
-                answer = "未知命令";
+                answer = ChatBotCommand.INFO.UNKNOWN_INFO;
                 break;
         }
         SendResponse execute = bot.execute(new SendMessage(chatId, answer));
@@ -179,9 +184,9 @@ public class ChatBotService implements IChatBotService {
     private void answerClear(TelegramBot bot, Long chatId) {
         logUtils.log(LogUtils.LogLevel.INFO, "answerClear", chatId, "clear", null);
         boolean result = chatCacheModel.deleteChat(chatId.toString());
-        String answer = "删除失败，请重试";
+        String answer = ChatBotCommand.INFO.CLEAR_INFO_ERROR;
         if (result) {
-            answer = "已删除聊天记录，请开始新一轮对话\nHave fun~";
+            answer = ChatBotCommand.INFO.CLEAR_INFO_SUCCESS;
         }
         SendResponse execute = bot.execute(new SendMessage(chatId, answer));
         boolean ok = execute.isOk();
@@ -200,7 +205,7 @@ public class ChatBotService implements IChatBotService {
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
             logUtils.log(LogUtils.LogLevel.ERROR, "answerByTextAsync", chatId, "question is null", null);
-            bot.execute(new SendMessage(chatId, "请输入内容"));
+            bot.execute(new SendMessage(chatId, ChatBotCommand.INFO.QUESTION_IS_NULL));
             return;
         }
         chatService.doText(question, (answer, msg) -> {
@@ -241,7 +246,7 @@ public class ChatBotService implements IChatBotService {
         sendState(chatId, ChatAction.typing);
         if (StringUtils.isEmpty(question)) {
             logUtils.log(LogUtils.LogLevel.ERROR, "answerByChatTurboAsync", chatId, "question is null", null);
-            bot.execute(new SendMessage(chatId, "请输入内容"));
+            bot.execute(new SendMessage(chatId, ChatBotCommand.INFO.QUESTION_IS_NULL));
             return;
         }
         //region 组装一条数据

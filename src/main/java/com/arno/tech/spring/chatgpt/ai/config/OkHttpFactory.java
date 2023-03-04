@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 @Configuration

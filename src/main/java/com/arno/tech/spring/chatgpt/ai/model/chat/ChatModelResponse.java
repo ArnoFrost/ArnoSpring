@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Chat 结构返回
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 @Data

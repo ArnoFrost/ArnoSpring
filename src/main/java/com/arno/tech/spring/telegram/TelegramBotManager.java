@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * Telegram 管理
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/02/07
  */
 @Component

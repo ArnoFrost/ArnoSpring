@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 /**
  * 聊天管理实现
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/04
  */
 @Service

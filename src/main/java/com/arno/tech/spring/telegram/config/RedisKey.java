@@ -3,7 +3,7 @@ package com.arno.tech.spring.telegram.config;
 /**
  * redis key
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 public interface RedisKey {

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Redis 获取配置逻辑
  *
- * @author xuxin14
+ * @author ArnoFrost
  * @since 2023/03/02
  */
 @Configuration
