@@ -9,4 +9,7 @@ package com.arno.tech.spring.telegram.service;
 public interface IChatBotService {
     void init();
 
+    boolean pushSingle(Long chatId, String msg);
+
+    boolean pushAll(String testMsg);
 }

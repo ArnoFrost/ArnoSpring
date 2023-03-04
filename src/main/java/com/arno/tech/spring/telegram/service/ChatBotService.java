@@ -12,18 +12,15 @@ import com.arno.tech.spring.telegram.model.bean.Role;
 import com.arno.tech.spring.base.utils.LogUtils;
 import com.arno.tech.spring.telegram.utils.TgApiUtils;
 import com.arno.tech.spring.user.service.IUserInfoService;
-import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
-import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -71,6 +68,20 @@ public class ChatBotService implements IChatBotService {
         });
     }
 
+    @Override
+    public boolean pushSingle(Long chatId, String msg) {
+        if (chatId == null || StringUtils.isEmpty(msg)) {
+            return false;
+        }
+        SendResponse execute = bot.execute(new SendMessage(chatId, msg));
+        return execute.isOk();
+    }
+
+    @Override
+    public boolean pushAll(String testMsg) {
+        return false;
+    }
+
     /**
      * 分发消息
      *
@@ -95,34 +106,34 @@ public class ChatBotService implements IChatBotService {
         logUtils.log(LogUtils.LogLevel.INFO, "dispatchUpdate", chatId, "text = " + text);
         String content;
         if (text.startsWith(ChatBotCommand.START)) {
-            answerHelp(bot, ChatBotCommand.START, chatId);
+            answerHelp(ChatBotCommand.START, chatId);
         } else if (text.startsWith(ChatBotCommand.HELP)) {
-            answerHelp(bot, ChatBotCommand.HELP, chatId);
+            answerHelp(ChatBotCommand.HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_TEXT_HELP)) {
-            answerHelp(bot, ChatBotCommand.CHAT_TEXT_HELP, chatId);
+            answerHelp(ChatBotCommand.CHAT_TEXT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_TEXT)) {
             //中断操作
-            if (isValidUser(chatId)) {
-                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+            if (!isValidUser(chatId)) {
+                answerHelp(ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
             content = text.substring(ChatBotCommand.CHAT_TEXT.length());
             answerByTextAsync(bot, content, chatId, messageId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_HELP)) {
-            answerHelp(bot, ChatBotCommand.CHAT_GPT_HELP, chatId);
+            answerHelp(ChatBotCommand.CHAT_GPT_HELP, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT_CLEAR)) {
             //中断操作
-            if (isValidUser(chatId)) {
-                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+            if (!isValidUser(chatId)) {
+                answerHelp(ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
             answerClear(bot, chatId);
         } else if (text.startsWith(ChatBotCommand.CHAT_GPT)) {
             //中断操作
-            if (isValidUser(chatId)) {
-                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+            if (!isValidUser(chatId)) {
+                answerHelp(ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
@@ -132,8 +143,8 @@ public class ChatBotService implements IChatBotService {
             // 兜底改进用gpt 命令处理
 
             //中断操作
-            if (isValidUser(chatId)) {
-                answerHelp(bot, ChatBotCommand.REGISTER, chatId);
+            if (!isValidUser(chatId)) {
+                answerHelp(ChatBotCommand.REGISTER, chatId);
                 logUtils.log(LogUtils.LogLevel.WARN, "dispatchUpdate", chatId, "chatId is not in white list");
                 return;
             }
@@ -146,11 +157,10 @@ public class ChatBotService implements IChatBotService {
     /**
      * 显示帮助信息
      *
-     * @param bot      botApi
      * @param helpType 帮助类型
      * @param chatId   对话Id
      */
-    private void answerHelp(TelegramBot bot, String helpType, Long chatId) {
+    private void answerHelp(String helpType, Long chatId) {
         logUtils.log(LogUtils.LogLevel.INFO, "answerHelp", chatId, "helpType = " + helpType);
         String answer = "";
         switch (helpType) {

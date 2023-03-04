@@ -11,17 +11,6 @@ import java.util.Map;
  */
 public interface ChatBotCommand {
 
-    /**
-     * ```telegram command
-     * start - 开始
-     * help - 帮助
-     * text - text-davinci-003模型
-     * text_help - text-davinci-003模型使用说明
-     * gpt - gpt-3.5-turbo模型
-     * gpt_help - gpt-3.5-turbo模型使用说明
-     * gpt_clear - 清空gpt-3.5-turbo聊天记录
-     * ```
-     */
     String START = "/start";
     String HELP = "/help";
     String CHAT_TEXT = "/text";
@@ -65,17 +54,6 @@ public interface ChatBotCommand {
     }
 
     interface AdminCommand {
-        /**
-         * ```telegram command
-         * register - 注册
-         * delete_user - 删除用户
-         * ban_user - 禁用账户
-         * unban_user - 解封账户
-         * get_user_list - 获取用户列表
-         * fetch_log - 获取日志
-         * help - 获得帮助
-         * ```
-         */
         String REGISTER = "/register";
         String DELETE_USER = "/delete_user";
         String BAN_USER = "/ban_user";
@@ -83,6 +61,10 @@ public interface ChatBotCommand {
 
         String GET_USER_LIST = "/get_user_list";
         String FETCH_LOG = "/fetch_log";
+
+        String PUSH_TEST = "/push_test";
+
+        String PUSH_ALL = "/push_all";
         String HELP = "/help";
     }
 }

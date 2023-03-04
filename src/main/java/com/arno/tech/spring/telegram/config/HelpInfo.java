@@ -21,6 +21,7 @@ public class HelpInfo {
     private static String ADMIN_HELP_STR = "";
     public HelpInfo() {
         /**
+         * ```telegram command
          * start - 开始
          * help - 帮助
          * text - text-davinci-003模型
@@ -28,6 +29,7 @@ public class HelpInfo {
          * gpt - gpt-3.5-turbo模型
          * gpt_help - gpt-3.5-turbo模型使用说明
          * gpt_clear - 清空gpt-3.5-turbo聊天记录
+         * ```
          */
         rawMap.put(ChatBotCommand.START, "开始");
         rawMap.put(ChatBotCommand.HELP, "帮助");
@@ -47,6 +49,8 @@ public class HelpInfo {
          * unban_user - 解封账户
          * get_user_list - 获取用户列表
          * fetch_log - 获取日志
+         * push_test - 测试发送
+         * push_all - 发送广播
          * help - 获得帮助
          * ```
          */
@@ -57,6 +61,8 @@ public class HelpInfo {
         adminRawMap.put(ChatBotCommand.AdminCommand.UNBAN_USER, "解封账户");
         adminRawMap.put(ChatBotCommand.AdminCommand.GET_USER_LIST, "获取用户列表");
         adminRawMap.put(ChatBotCommand.AdminCommand.FETCH_LOG, "获取日志");
+        adminRawMap.put(ChatBotCommand.AdminCommand.PUSH_TEST, "测试发送");
+        adminRawMap.put(ChatBotCommand.AdminCommand.PUSH_ALL, "发送广播");
         adminRawMap.put(ChatBotCommand.AdminCommand.HELP, "获得帮助");
 
 

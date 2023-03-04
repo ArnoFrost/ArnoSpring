@@ -11,10 +11,13 @@ import com.arno.tech.spring.user.service.IUserInfoService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ChatAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 聊天管理实现
@@ -24,20 +27,25 @@ import java.util.List;
  */
 @Service
 public class ChatAdminBotService implements IChatAdminBotService {
+
+
     private final TgConfig config;
 
     private TelegramBot bot;
 
     private final IUserInfoService userInfoService;
 
+    private final IChatBotService chatBotService;
+
     private final HelpInfo helpInfo;
     private final LogUtils logUtils;
 
 
     @Autowired
-    public ChatAdminBotService(TgConfig config, IUserInfoService userInfoService, HelpInfo helpInfo) {
+    public ChatAdminBotService(TgConfig config, IUserInfoService userInfoService, ChatBotService chatBotService, HelpInfo helpInfo) {
         this.config = config;
         this.userInfoService = userInfoService;
+        this.chatBotService = chatBotService;
         this.helpInfo = helpInfo;
         logUtils = LogUtils.getInstance();
     }
@@ -101,10 +109,45 @@ public class ChatAdminBotService implements IChatAdminBotService {
             replyMessage("dispatchUpdate", chatId, messageId, helpInfo.getAdminHelpString());
         } else if (text.startsWith(ChatBotCommand.AdminCommand.GET_USER_LIST)) {
             getUserList(chatId, messageId);
+        } else if (text.startsWith(ChatBotCommand.AdminCommand.PUSH_TEST)) {
+            String pushMsg = text.substring(ChatBotCommand.AdminCommand.PUSH_TEST.length());
+            pushTest(chatId, messageId, pushMsg);
+        } else if (text.startsWith(ChatBotCommand.AdminCommand.PUSH_ALL)) {
+            String pushMsg = text.substring(ChatBotCommand.AdminCommand.PUSH_ALL.length());
+            pushAll(chatId, messageId, pushMsg);
         } else {
             replyMessage("dispatchUpdate", chatId, messageId, "未知指令~");
         }
 
+    }
+
+    private void pushTest(Long chatId, Integer messageId, String pushMsg) {
+        TgApiUtils.sendState(bot, chatId, ChatAction.typing);
+        if (pushMsg == null || pushMsg.isEmpty()) {
+            replyMessage("pushTest", chatId, messageId, "推送内容不能为空~");
+            return;
+        }
+        String pushId = config.getAdmin().getId();
+        boolean success = chatBotService.pushSingle(Long.parseLong(pushId), pushMsg);
+        if (success) {
+            replyMessage("pushTest", chatId, messageId, "推送成功~");
+        } else {
+            replyMessage("pushTest", chatId, messageId, "推送失败~");
+        }
+    }
+
+    private void pushAll(Long chatId, Integer messageId, String pushMsg) {
+        TgApiUtils.sendState(bot, chatId, ChatAction.typing);
+        if (pushMsg == null || pushMsg.isEmpty()) {
+            replyMessage("pushAll", chatId, messageId, "推送内容不能为空~");
+            return;
+        }
+        boolean success = chatBotService.pushAll(pushMsg);
+        if (success) {
+            replyMessage("pushAll", chatId, messageId, "推送成功~");
+        } else {
+            replyMessage("pushAll", chatId, messageId, "推送失败~");
+        }
     }
 
     private void getUserList(Long chatId, Integer messageId) {
@@ -113,12 +156,13 @@ public class ChatAdminBotService implements IChatAdminBotService {
             replyMessage("getUserList", chatId, messageId, "用户列表为空~");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        for (User user : userList) {
-            sb.append(user.toString()).append("\n");
-        }
+        String result = userList.stream()
+                .sorted(Comparator.comparing(User::getName))
+                .map(user -> String.format("用户ID：%s，用户名：%s，状态：%s，角色：%s",
+                        user.getId(), user.getName(), user.getStatus(), user.getRole()))
+                .collect(Collectors.joining("\n"));
 
-        replyMessage("getUserList", chatId, messageId, sb.toString());
+        replyMessage("getUserList", chatId, messageId, result);
     }
 
 
